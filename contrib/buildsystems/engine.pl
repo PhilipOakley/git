@@ -122,6 +122,7 @@ sub parseMakeOutput
     print "Parsing GNU Make output to figure out build structure...\n";
     my $line = 0;
     while (my $text = shift @makedry) {
+	# print "$text\n";
         my $ate_next;
         do {
             $ate_next = 0;
@@ -142,6 +143,7 @@ sub parseMakeOutput
 
         if($text =~ / -c /) {
             # compilation
+			print "compile line $line - $text\n";
             handleCompileLine($text, $line);
 
         } elsif ($text =~ / -o /) {
@@ -199,9 +201,9 @@ sub parseMakeOutput
         }
     }
 
-#    use Data::Dumper;
-#    print "Parsed build structure:\n";
-#    print Dumper(%build_structure);
+    use Data::Dumper;
+    print "Parsed build structure:\n";
+    print Dumper(%build_structure);
 }
 
 # variables for the compilation part of each step

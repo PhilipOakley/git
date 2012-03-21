@@ -1,0 +1,2 @@
+CFLAGS += -Imsvcgit/32bits/include
+LDFLAGS += -Lmsvcgit/32bits/lib
