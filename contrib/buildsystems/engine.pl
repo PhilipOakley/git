@@ -12,6 +12,7 @@ use File::Basename;
 use File::Spec;
 use Cwd;
 use Generators;
+use Text::ParseWords;
 
 my (%build_structure, %compile_options, @makedry);
 my $out_dir = getcwd();
@@ -122,7 +123,7 @@ sub parseMakeOutput
     print "Parsing GNU Make output to figure out build structure...\n";
     my $line = 0;
     while (my $text = shift @makedry) {
-	# print "$text\n";
+    print "$text\n"; # show the makedry line
         my $ate_next;
         do {
             $ate_next = 0;
@@ -141,9 +142,14 @@ sub parseMakeOutput
             next;
         }
 
+        if ($text =~ /^mkdir /) {
+            # options to the Portable Object translations in line
+            # mkdir -p po/... && msgfmt ... (eg -o) may be mistaken for linker options
+            next;
+        }
+
         if($text =~ / -c /) {
             # compilation
-			print "compile line $line - $text\n";
             handleCompileLine($text, $line);
 
         } elsif ($text =~ / -o /) {
@@ -201,9 +207,9 @@ sub parseMakeOutput
         }
     }
 
-    use Data::Dumper;
-    print "Parsed build structure:\n";
-    print Dumper(%build_structure);
+#    use Data::Dumper;
+#    print "Parsed build structure:\n";
+#    print Dumper(%build_structure);
 }
 
 # variables for the compilation part of each step
@@ -233,7 +239,8 @@ sub removeDuplicates
 sub handleCompileLine
 {
     my ($line, $lineno) = @_;
-    my @parts = split(' ', $line);
+    # my @parts = split(' ', $line);
+    my @parts = quotewords('\s+', 0, $line);
     my $sourcefile;
     shift(@parts); # ignore cmd
     while (my $part = shift @parts) {
@@ -252,6 +259,7 @@ sub handleCompileLine
         } elsif ($part =~ /\.(c|cc|cpp)$/) {
             $sourcefile = $part;
         } else {
+            print "full line: $line\n";
             die "Unhandled compiler option @ line $lineno: $part";
         }
     }
@@ -267,7 +275,8 @@ sub handleLibLine
     my (@objfiles, @lflags, $libout, $part);
     # kill cmd and rm 'prefix'
     $line =~ s/^rm -f .* && .* rcs //;
-    my @parts = split(' ', $line);
+    # my @parts = split(' ', $line);
+    my @parts = quotewords('\s+', 0, $line);
     while ($part = shift @parts) {
         if ($part =~ /^-/) {
             push(@lflags, $part);
@@ -277,6 +286,7 @@ sub handleLibLine
             $libout = $part;
             $libout =~ s/\.a$//;
         } else {
+            print "full line: $line\n";
             die "Unhandled lib option @ line $lineno: $part";
         }
     }
@@ -308,7 +318,9 @@ sub handleLinkLine
 {
     my ($line, $lineno) = @_;
     my (@objfiles, @lflags, @libs, $appout, $part);
-    my @parts = split(' ', $line);
+    # my @parts = split(' ', $line);
+    my @parts = quotewords('\s+', 0, $line);
+
     shift(@parts); # ignore cmd
     while ($part = shift @parts) {
         if ($part =~ /^-IGNORE/) {
@@ -331,7 +343,8 @@ sub handleLinkLine
         } elsif ($part =~ /\.(o|obj)$/) {
             push(@objfiles, $part);
         } else {
-            die "Unhandled lib option @ line $lineno: $part";
+            print "full line: $line\n";
+            print "Unhandled lib option @ line $lineno: $part\n"; # die (if !DEBUG)
         }
     }
 #    print "AppOut: '$appout'\nLFlags: @lflags\nLibs  : @libs\nOfiles: @objfiles\n";
