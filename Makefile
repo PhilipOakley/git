@@ -1247,6 +1247,7 @@ ifeq ($(uname_S),Minix)
 	NO_CURL =
 	NO_EXPAT =
 endif
+$(warning Testing MINGW $(uname_S))
 ifneq (,$(findstring MINGW,$(uname_S)))
 	pathsep = ;
 	NO_PREAD = YesPlease
@@ -1291,6 +1292,8 @@ ifneq (,$(findstring MINGW,$(uname_S)))
 	PTHREAD_LIBS =
 	X = .exe
 	SPARSE_FLAGS = -Wno-one-bit-signed-bitfield
+#	EXTLIBS += -"$(../*)"
+$(warning Testing THIS_IS_MSYSGIT)
 ifneq (,$(wildcard ../THIS_IS_MSYSGIT))
 	htmldir=doc/git/html/
 	prefix =

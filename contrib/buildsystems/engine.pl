@@ -207,9 +207,9 @@ sub parseMakeOutput
         }
     }
 
-#    use Data::Dumper;
-#    print "Parsed build structure:\n";
-#    print Dumper(%build_structure);
+    use Data::Dumper;
+    print "Parsed build structure:\n";
+    print Dumper(%build_structure);
 }
 
 # variables for the compilation part of each step
