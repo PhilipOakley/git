@@ -140,6 +140,18 @@ sub parseMakeOutput
             next;
         }
 
+        if ($text =~ /^mkdir /) {
+            # options to the Portable Object translations in the line
+            # mkdir -p po/... && msgfmt ... (eg -o) may be mistaken for linker options
+            next;
+        }
+
+        if ($text =~ /^msgfmt /) {
+            # options to the Portable Object translations in the line
+            # mkdir -p po/... && msgfmt ... (eg -o) may be mistaken for linker options
+            next;
+        }
+
         if($text =~ / -c /) {
             # compilation
             handleCompileLine($text, $line);
