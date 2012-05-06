@@ -1,0 +1,49 @@
+MSVC (2010) in the IDE git fixes.
+
+1. the i18n 5e9637c6 broke engine.pl (git) code for extracting the git.sln for msvc gui-IDE with an extra '-o' option in the make file.
+add 'msgfmt' and its precursor 'mkdir' tests.
+(in same vein as 74cf9bdda6)
+
+2. the engine.pl (git) script barfs on properly quoted space in filename options prevalent on windows. Use quotewords rather than split to separate such options.
+
+3. add noob clarification comments to the msvc-build (msysgit) script [to get them past the initial kruger-dunning catch-22 step]
+
+4. point git/compat/vsbuild/README) (git) at the new msysgit/bin/msvc-build script for those with msysgit repo.
+While we are at it add extra whitespace for extra clarity of the "either"/"or" sub sections (not sure about the indents in step 4 of the README)
+
+5. clarify (in the git/compat/vsbuild/README) (git)) 2008 .sln vs 2010 .suo file changes, and the Windows association change (the web install of VS2010 doesn't associate sln directly with VS2010, rather to the verselector).
+
+6a. resolve if the 'clean' needs MSVC=1 - what is it cleaning - cleaning out the old gcc build, or a faulty MSVC build?
+6b. add extra VS-2010 clean actions to msvc-build (msysgit). (vcprojx, etc.)
+
+7. clean the other make lib products in msvc-build (msysgit).
+
+8. document which bash/bat/cmd/vscmd to start from, and how to tell the difference (in the readme (git)?).
+
+9. http://help.github.com/fork-a-repo/ add text about the normal flow for helping on msysgit/devel and whether to use a personal fork.
+
+10?. Sort out what MSVC=1 is meant to represent. At the moment it (appears to) confounds "Windows" environment (as opposed to MinGW etc, in engine.pl) with using the MS Visual C compiler (as opposed to gcc), with a possible further confusion about presumed libraries etc by the MSVC IDE. 
+
+[We want the output of the msvc-build script (plain vanilla) to start OK and compile, and then 
+the New Dumb User can investigate this strange new world without being scared off too soon.]
+
+sort when THIS_IS_MSYSGIT arrived in msysgit, and the makefile (the MinGW make section). Was it before or after the MSVC engine was written - i.e. did its introduction break the gui IDE build, or vice versa.
+48c46f1a » sprohaska 2009-05-31 MinGW: Teach Makefile to detect msysgit and apply specific settings	1294	ifneq (,$(wildcard ../THIS_IS_MSYSGIT))
+
+
+259d87c3 » mstormo 2009-09-16 Add scripts to generate projects for other buildsystems (MSVC vcproj,…	1	#!/usr/bin/perl -w
+
+
+d691d84e » Ramsay Jones 2009-11-07 Makefile: keep MSVC and Cygwin configuration separate	
+303	ifdef MSVC
+304		# avoid the MingW and Cygwin configuration sections
+
+
+http://thread.gmane.org/gmane.comp.version-control.git/131374/focus=132142 (but you are avoiding the MinGW configuration as well...)
+
+http://stackoverflow.com/questions/9084365/can-git-be-built-with-vc (my comment on PatThoyts' )
+
+This sort of suggests that the original intent was MSVC meant the compiler/IDE and not a raw  "Windows" environment.
+
+10. (side note) rebase -i manual to also point to cherry pick // or, the noop message to add the information about what the noob error was ..  (confusion between rebase branch onto another branch, and rebase interactively the current branch from commit <n> - i.e. the initial mush I committed)
+
