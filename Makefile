@@ -288,6 +288,11 @@ all::
 # dependency rules.
 #
 # Define NATIVE_CRLF if your platform uses CRLF for line endings.
+#
+# Define MSVC=1 to create a Windows make file
+# Define MSVC !=1, e.g. =2, to create a Windows make file when you can
+# (a) set the StartAction in the MSVC IDE, hence run your environment while debugging, or
+# (b) want to compile a full equivalent executable with any MSVC version.
 
 GIT-VERSION-FILE: FORCE
 	@$(SHELL_PATH) ./GIT-VERSION-GEN
@@ -301,9 +306,13 @@ uname_P := $(shell sh -c 'uname -p 2>/dev/null || echo not')
 uname_V := $(shell sh -c 'uname -v 2>/dev/null || echo not')
 
 ifdef MSVC
-	# avoid the MingW and Cygwin configuration sections
+ifeq ($(MSVC),1)
+	# avoid the MingW and Cygwin configuration sections and use
+	# a Windows section specific to an MSVC IDE version without 
+	# the ability to set the StartAction, e.g. MSVC2005/2008/2010 Express editions.
 	uname_S := Windows
 	uname_O := Windows
+endif
 endif
 
 # CFLAGS and LDFLAGS are for the users to override from the command line.
