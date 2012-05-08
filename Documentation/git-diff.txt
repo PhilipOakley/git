@@ -3,7 +3,7 @@ git-diff(1)
 
 NAME
 ----
-git-diff - Show changes between commits, commit and working tree, etc
+git-diff - Show changes, usually as a patch, between commits, commit and working tree, etc
 
 
 SYNOPSIS
@@ -18,7 +18,8 @@ DESCRIPTION
 -----------
 Show changes between the working tree and the index or a tree, changes
 between the index and a tree, changes between two trees, or changes
-between two files on disk.
+between two files on disk. You can implement a diff's patch using linkgit:git-apply[1].
+
 
 'git diff' [--options] [--] [<path>...]::
 
