@@ -339,7 +339,7 @@ Know the status of your patch after submission
   the status of various proposed changes.
 
 ------------------------------------------------
-MUA specific hints
+MUA (Mail User Agent) specific hints
 
 Some of patches I receive or pick up from the list share common
 patterns of breakage.  Please make sure your MUA is set up
