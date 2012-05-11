@@ -23,6 +23,7 @@ die "Couldn't find Git repo" if ("$git_dir" eq "");
 
 my @gens = Generators::available();
 my $gen = "Vcproj";
+my $MSVC = "MSCV=1";
 
 sub showUsage
 {
@@ -33,6 +34,8 @@ generate usage:
                                     Available: $genlist
   -o <PATH>       --out <PATH>      Specify output directory generation  (default: .)
   -i <FILE>       --in <FILE>       Specify input file, instead of running GNU Make
+                  --MSVC=<val>      Specify the style of use of MSVC.
+  Run/debug in native windows =1. Run .exe / Debug via StartAction (pro Editions) =2.
   -h,-?           --help            This help
 EOM
     exit 0;
@@ -48,6 +51,10 @@ while (@ARGV) {
 	$out_dir = shift @ARGV;
     } elsif("$arg" eq "--gen" || "$arg" eq "-g") {
 	$gen = shift @ARGV;
+
+    } elsif(substr("$arg",0,7) eq "--MSVC=") {
+	my $MSVC = substr("$arg",2);
+
     } elsif("$arg" eq "--in" || "$arg" eq "-i") {
 	my $infile = shift @ARGV;
         open(F, "<$infile") || die "Couldn't open file $infile";
@@ -73,7 +80,7 @@ Running GNU Make to figure out build structure...
 EOM
 
 # Pipe a make --dry-run into a variable, if not already loaded from file
-@makedry = `cd $git_dir && make -n MSVC=1 V=1 2>/dev/null` if !@makedry;
+@makedry = `cd $git_dir && make -n $MSVC V=1 2>/dev/null` if !@makedry;
 
 # Parse the make output into usable info
 parseMakeOutput();

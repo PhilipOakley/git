@@ -290,7 +290,7 @@ all::
 # Define NATIVE_CRLF if your platform uses CRLF for line endings.
 #
 # Define MSVC=1 to create a Windows make file
-# Define MSVC !=1, e.g. =2, to create a Windows make file when you can
+# Define MSVC=2, to create a Windows make file if you can
 # (a) set the StartAction in the MSVC IDE, hence run your environment while debugging, or
 # (b) want to compile a full equivalent executable with any MSVC version.
 
