@@ -17,10 +17,10 @@
 #     make MSVC=1
 
 # Using MSVC=2 indicates that you will either use the MSVC IDE's exe,
-# which should be no different to using the cl.exe in the amke file,
+# which should be no different to using the cl.exe in the make file,
 # or be using the MSVC IDE's StartAction to start your prefered run
-# time environment (Msys, Mi nGW, Cygwin, etc.) before the MSVC IDE's
-# devbugger cuts in at your breakpoint.
+# time environment (Msys, MinGW, Cygwin, etc.) before the MSVC IDE's
+# debugger cuts in at your breakpoint.
 
 # The Express editions do not have the StartAction facility, so to
 # debug with them you need to use the native windows environment.
