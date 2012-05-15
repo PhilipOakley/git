@@ -44,6 +44,7 @@ EOM
 # Parse command-line options
 while (@ARGV) {
     my $arg = shift @ARGV;
+	print "$arg \n";
     if ("$arg" eq "-h" || "$arg" eq "--help" || "$arg" eq "-?") {
 	showUsage();
 	exit(0);
@@ -51,15 +52,16 @@ while (@ARGV) {
 	$out_dir = shift @ARGV;
     } elsif("$arg" eq "--gen" || "$arg" eq "-g") {
 	$gen = shift @ARGV;
-
     } elsif(substr("$arg",0,7) eq "--MSVC=") {
-	my $MSVC = substr("$arg",2);
-
+	$MSVC = substr("$arg",2);
+	print "Found MSVC : $MSVC\n";
     } elsif("$arg" eq "--in" || "$arg" eq "-i") {
 	my $infile = shift @ARGV;
         open(F, "<$infile") || die "Couldn't open file $infile";
         @makedry = <F>;
         close(F);
+	} else {
+		print "Unknown: $arg\n";
     }
 }
 
@@ -75,6 +77,7 @@ print << "EOM";
 Generator: $gen
 Git dir:   $git_dir
 Out dir:   $out_dir
+$MSVC
 -----
 Running GNU Make to figure out build structure...
 EOM
@@ -130,6 +133,7 @@ sub parseMakeOutput
     print "Parsing GNU Make output to figure out build structure...\n";
     my $line = 0;
     while (my $text = shift @makedry) {
+    print "$text\n"; # show the makedry line
         my $ate_next;
         do {
             $ate_next = 0;
@@ -219,9 +223,9 @@ sub parseMakeOutput
         }
     }
 
-#    use Data::Dumper;
-#    print "Parsed build structure:\n";
-#    print Dumper(%build_structure);
+    use Data::Dumper;
+    print "Parsed build structure:\n";
+    print Dumper(%build_structure);
 }
 
 # variables for the compilation part of each step
@@ -271,7 +275,9 @@ sub handleCompileLine
         } elsif ($part =~ /\.(c|cc|cpp)$/) {
             $sourcefile = $part;
         } else {
-            die "Unhandled compiler option @ line $lineno: $part";
+            print "full line: $line\n";
+            print "A:-Unhandled compiler option @ line $lineno: $part\n"; # die (if !DEBUG)
+#            die "Unhandled compiler option @ line $lineno: $part";
         }
     }
     @{$compile_options{"${sourcefile}_CFLAGS"}} = @cflags;
@@ -297,7 +303,9 @@ sub handleLibLine
             $libout = $part;
             $libout =~ s/\.a$//;
         } else {
-            die "Unhandled lib option @ line $lineno: $part";
+            print "full line: $line\n";
+            print "B:-Unhandled lib option @ line $lineno: $part\n"; # die (if !DEBUG)
+ #           die "Unhandled lib option @ line $lineno: $part";
         }
     }
 #    print "LibOut: '$libout'\nLFlags: @lflags\nOfiles: @objfiles\n";
@@ -353,7 +361,9 @@ sub handleLinkLine
         } elsif ($part =~ /\.(o|obj)$/) {
             push(@objfiles, $part);
         } else {
-            die "Unhandled lib option @ line $lineno: $part";
+            print "full line: $line\n";
+            print "C:-Unhandled link option @ line $lineno: $part\n"; # die (if !DEBUG)
+#            die "Unhandled link option @ line $lineno: $part";
         }
     }
 #    print "AppOut: '$appout'\nLFlags: @lflags\nLibs  : @libs\nOfiles: @objfiles\n";
