@@ -1201,17 +1201,18 @@ ifeq ($(uname_S),Windows)
 	NATIVE_CRLF = YesPlease
 	NO_D_INO_IN_DIRENT = YesPlease
 
-	CC = compat/vcbuild/scripts/clink.pl
-	AR = compat/vcbuild/scripts/lib.pl
+	COMPAT_CFLAGS = -D__USE_MINGW_ACCESS -DNOGDI -DHAVE_STRING_H -DHAVE_ALLOCA_H -Icompat -Icompat/regex -Icompat/win32 -DSTRIP_EXTENSION=\".exe\"
 	CFLAGS =
 	BASIC_CFLAGS = -nologo -I. -I../zlib -Icompat/vcbuild -Icompat/vcbuild/include -DWIN32 -D_CONSOLE -DHAVE_STRING_H -D_CRT_SECURE_NO_WARNINGS -D_CRT_NONSTDC_NO_DEPRECATE
 	COMPAT_OBJS = compat/msvc.o compat/winansi.o \
 		compat/win32/pthread.o compat/win32/syslog.o \
 		compat/win32/poll.o compat/win32/dirent.o
-	COMPAT_CFLAGS = -D__USE_MINGW_ACCESS -DNOGDI -DHAVE_STRING_H -DHAVE_ALLOCA_H -Icompat -Icompat/regex -Icompat/win32 -DSTRIP_EXTENSION=\".exe\"
 	BASIC_LDFLAGS = -IGNORE:4217 -IGNORE:4049 -NOLOGO -SUBSYSTEM:CONSOLE
 	EXTLIBS = user32.lib advapi32.lib shell32.lib wininet.lib ws2_32.lib
+	CC = compat/vcbuild/scripts/clink.pl
+	AR = compat/vcbuild/scripts/lib.pl
 	PTHREAD_LIBS =
+	X = .exe
 	lib =
 ifndef DEBUG
 	BASIC_CFLAGS += -GL -Os -MD
@@ -1220,7 +1221,6 @@ ifndef DEBUG
 else
 	BASIC_CFLAGS += -Zi -MDd
 endif
-	X = .exe
 endif
 ifeq ($(uname_S),Interix)
 	NO_INITGROUPS = YesPlease
