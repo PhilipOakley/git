@@ -78,7 +78,7 @@ if test -z "$gui"
 then
 	echo 'make MSVC=1' >> msvc-build.cmd
 else
-	echo 'perl contrib/buildsystems/generate -g Vcproj' >> msvc-build.cmd
+	echo 'perl contrib/buildsystems/generate -g Vcproj --MSVC=2' >> msvc-build.cmd
 	echo 'start git.sln' >> msvc-build.cmd
 fi
 
