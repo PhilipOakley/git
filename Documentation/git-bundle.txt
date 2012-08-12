@@ -21,12 +21,12 @@ Some workflows require that one or more branches of development on one
 machine be replicated on another machine, but the two machines cannot
 be directly connected, and therefore the interactive git protocols (git,
 ssh, rsync, http) cannot be used.  This command provides support for
-'git fetch' and 'git pull' to operate by packaging objects and references
-in an archive at the originating machine, then importing those into
-another repository using 'git fetch' and 'git pull'
-after moving the archive by some means (e.g., by sneakernet).  As no
-direct connection between the repositories exists, the user must specify a
-basis for the bundle that is held by the destination repository: the
+'git fetch', 'git pull' and 'git clone', to operate by packaging
+objects and references in an archive at the originating machine, then
+importing those into another repository using 'git fetch', 'git pull',
+or 'git clone', after moving the archive by some means (e.g., by sneakernet).
+As no direct connection between the repositories exists, the user must
+specify a basis for the bundle that is held by the destination repository: the
 bundle assumes that all objects in the basis are already in the
 destination repository.
 
@@ -35,7 +35,7 @@ OPTIONS
 
 create <file>::
 	Used to create a bundle named 'file'.  This requires the
-	'git-rev-list-args' arguments to define the bundle contents.
+	<git-rev-list-args> arguments to define the bundle contents.
 
 verify <file>::
 	Used to check that a bundle file is valid and will apply
@@ -91,6 +91,8 @@ It is very important that the basis used be held by the destination.
 It is okay to err on the side of caution, causing the bundle file
 to contain objects already in the destination, as these are ignored
 when unpacking at the destination.
+
+To create a bundle for 'git clone', use `--all` for the <git-rev-list-args>.
 
 EXAMPLE
 -------
