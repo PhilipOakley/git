@@ -22,11 +22,13 @@ unusually rich command set that provides both high-level operations
 and full access to internals.
 
 See linkgit:gittutorial[7] to get started, then see
-link:everyday.html[Everyday Git] for a useful minimum set of commands, and
-"man git-commandname" for documentation of each command.  CVS users may
-also want to read linkgit:gitcvs-migration[7].  See
-the link:user-manual.html[Git User's Manual] for a more in-depth
-introduction.
+link:everyday.html[Everyday Git] for a useful minimum set of commands.
+Use "man git-commandname" for documentation of each command, or "git help".
+
+CVS users may also want to read linkgit:gitcvs-migration[7].
+
+See the link:user-manual.html[Git User's Manual] for a more in-depth
+introduction, and linkgit:gitcli[7] for details of git's command line interface.
 
 The '<command>' is either a name of a Git command (see below) or an alias
 as defined in the configuration file (see linkgit:git-config[1]).
