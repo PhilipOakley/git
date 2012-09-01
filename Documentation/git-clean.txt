@@ -63,6 +63,12 @@ OPTIONS
 	Remove only files ignored by git.  This may be useful to rebuild
 	everything from scratch, but keep manually created files.
 
+SEE ALSO
+--------
+linkgit:gitignore[5]
+linkgit:gitrepository-layout[5]
+The optional configuration variable `core.excludesfile` linkgit:git-config[1]
+
 GIT
 ---
 Part of the linkgit:git[1] suite
