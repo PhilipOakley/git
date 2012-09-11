@@ -119,12 +119,13 @@ OPTIONS
 	Activate the list mode. `git branch <pattern>` would try to create a branch,
 	use `git branch --list <pattern>` to list matching branches.
 
--v::
+-v, -vv::
 --verbose::
 	When in list mode,
 	show sha1 and commit subject line for each head, along with
 	relationship to upstream branch (if any). If given twice, print
-	the name of the upstream branch, as well.
+	the name of the upstream branch, as well (see also `git remote
+	show <remote>`). 
 
 --abbrev=<length>::
 	Alter the sha1's minimum display length in the output listing.
