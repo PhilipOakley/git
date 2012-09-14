@@ -26,6 +26,8 @@ check_show 55188000 '1 year, 9 months ago'
 check_show 630000000 '20 years ago'
 check_show 31449600 '12 months ago'
 check_show 62985600 '2 years ago'
+check_show -5 '5 seconds in the future'
+check_show -55188000 '1 year, 9 months in the future'
 
 check_parse() {
 	echo "$1 -> $2" >expect

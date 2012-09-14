@@ -86,78 +86,179 @@ static int local_tzoffset(unsigned long time)
 	return offset * eastwest;
 }
 
+enum relative_style {
+	rd_seconds = 0, rd_minutes, rd_hours, rd_days, rd_weeks, rd_months, rd_years
+};
+
+struct relative_date {
+	int seconds;
+	int minutes;
+	int hours;
+	int days;
+	int weeks;
+	int months;
+	int years;
+};
+
+static enum relative_style format_relative_date(unsigned long diff,
+						struct relative_date *rd)
+{
+	memset(rd, 0, sizeof(*rd));
+	if (diff < 90) {
+		rd->seconds = diff;
+		return rd_seconds;
+	}
+	/* Turn it into minutes */
+	diff = (diff + 30) / 60;
+	if (diff < 90) {
+		rd->minutes = diff;
+		return rd_minutes;
+	}
+	/* Turn it into hours */
+	diff = (diff + 30) / 60;
+	if (diff < 36) {
+		rd->hours = diff;
+		return rd_hours;
+	}
+	/* We deal with number of days from here on */
+	diff = (diff + 12) / 24;
+	if (diff < 14) {
+		rd->days = diff;
+		return rd_days;
+	}
+	/* Say weeks for the past 10 weeks or so */
+	if (diff < 70) {
+		rd->weeks = (diff + 3) / 7;
+		return rd_weeks;
+	}
+	/* Say months for the past 12 months or so */
+	if (diff < 365) {
+		rd->months = (diff + 15) / 30;
+		return rd_months;
+	}
+	/* Give years and months for 5 years or so */
+	if (diff < 1825) {
+		unsigned long totalmonths = (diff * 12 * 2 + 365) / (365 * 2);
+		rd->years = totalmonths / 12;
+		rd->months = totalmonths % 12;
+		return rd_years;
+	}
+	/* Otherwise, just years. Centuries is probably overkill. */
+	rd->years = (diff + 183) / 365;
+	return rd_years;
+}
+
 void show_date_relative(unsigned long time, int tz,
 			       const struct timeval *now,
 			       struct strbuf *timebuf)
 {
 	unsigned long diff;
+	struct relative_date rd;
+	int pf = 0; /* past or future */
+
+	struct {
+		struct { const char *s, *p; } msg_seconds;
+		struct { const char *s, *p; } msg_minutes;
+		struct { const char *s, *p; } msg_hours;
+		struct { const char *s, *p; } msg_days;
+		struct { const char *s, *p; } msg_weeks;
+		struct { const char *s, *p; } msg_months;
+		struct { const char *s, *p; } msg_years_only;
+		struct { const char *s, *p; } msg_years_months;
+		struct { const char *s, *p; } msg_years;
+	} msg[2] = {
+		{
+			{ "%lu second ago", "%lu seconds ago" },
+			{ "%lu minute ago", "%lu minutes ago" },
+			{ "%lu hour ago", "%lu hours ago" },
+			{ "%lu day ago", "%lu days ago" },
+			{ "%lu week ago", "%lu weeks ago" },
+			{ "%lu month ago", "%lu months ago" },
+			{ "%lu year", "%lu years" },
+			{
+				/* TRANSLATORS: "%s" is "<n> years" */
+				"%s, %lu month ago",
+				/* TRANSLATORS: "%s" is "<n> years" */
+				"%s, %lu months ago"
+			},
+			{ "%lu year ago", "%lu years ago" },
+		},
+		{
+			{ "%lu second in the future", "%lu seconds in the future" },
+			{ "%lu minute in the future", "%lu minutes in the future" },
+			{ "%lu hour in the future", "%lu hours in the future" },
+			{ "%lu day in the future", "%lu days in the future" },
+			{ "%lu week in the future", "%lu weeks in the future" },
+			{ "%lu month in the future", "%lu months in the future" },
+			{ "%lu year", "%lu years" },
+			{
+				/* TRANSLATORS: "%s" is "<n> years" */
+				"%s, %lu month in the future",
+				/* TRANSLATORS: "%s" is "<n> years" */
+				"%s, %lu months in the future"
+			},
+			{ "%lu year in the future", "%lu years in the future" },
+		},
+	};
+
 	if (now->tv_sec < time) {
-		strbuf_addstr(timebuf, _("in the future"));
-		return;
+		diff = time - now->tv_sec;
+		pf = 1; /* in the future */
+	} else {
+		diff = now->tv_sec - time;
 	}
-	diff = now->tv_sec - time;
-	if (diff < 90) {
+
+	switch (format_relative_date(diff, &rd)) {
+	case rd_seconds:
 		strbuf_addf(timebuf,
-			 Q_("%lu second ago", "%lu seconds ago", diff), diff);
-		return;
-	}
-	/* Turn it into minutes */
-	diff = (diff + 30) / 60;
-	if (diff < 90) {
+			    Q_(msg[pf].msg_seconds.s, msg[pf].msg_seconds.p,
+			       rd.seconds), rd.seconds);
+		break;
+	case rd_minutes:
 		strbuf_addf(timebuf,
-			 Q_("%lu minute ago", "%lu minutes ago", diff), diff);
-		return;
-	}
-	/* Turn it into hours */
-	diff = (diff + 30) / 60;
-	if (diff < 36) {
+			    Q_(msg[pf].msg_minutes.s, msg[pf].msg_minutes.p,
+			       rd.minutes), rd.minutes);
+		break;
+	case rd_hours:
 		strbuf_addf(timebuf,
-			 Q_("%lu hour ago", "%lu hours ago", diff), diff);
-		return;
-	}
-	/* We deal with number of days from here on */
-	diff = (diff + 12) / 24;
-	if (diff < 14) {
+			    Q_(msg[pf].msg_hours.s, msg[pf].msg_hours.p,
+			       rd.hours), rd.hours);
+		break;
+	case rd_days:
 		strbuf_addf(timebuf,
-			 Q_("%lu day ago", "%lu days ago", diff), diff);
-		return;
-	}
-	/* Say weeks for the past 10 weeks or so */
-	if (diff < 70) {
+			    Q_(msg[pf].msg_days.s, msg[pf].msg_days.p,
+			       rd.days), rd.days);
+		break;
+	case rd_weeks:
 		strbuf_addf(timebuf,
-			 Q_("%lu week ago", "%lu weeks ago", (diff + 3) / 7),
-			 (diff + 3) / 7);
-		return;
-	}
-	/* Say months for the past 12 months or so */
-	if (diff < 365) {
+			    Q_(msg[pf].msg_weeks.s, msg[pf].msg_weeks.p,
+			       rd.weeks), rd.weeks);
+		break;
+	case rd_months:
 		strbuf_addf(timebuf,
-			 Q_("%lu month ago", "%lu months ago", (diff + 15) / 30),
-			 (diff + 15) / 30);
-		return;
-	}
-	/* Give years and months for 5 years or so */
-	if (diff < 1825) {
-		unsigned long totalmonths = (diff * 12 * 2 + 365) / (365 * 2);
-		unsigned long years = totalmonths / 12;
-		unsigned long months = totalmonths % 12;
-		if (months) {
+			    Q_(msg[pf].msg_months.s, msg[pf].msg_months.p,
+			       rd.months), rd.months);
+		break;
+
+	case rd_years:
+		if (rd.months) {
 			struct strbuf sb = STRBUF_INIT;
-			strbuf_addf(&sb, Q_("%lu year", "%lu years", years), years);
-			/* TRANSLATORS: "%s" is "<n> years" */
+			strbuf_addf(&sb, Q_(msg[pf].msg_years_only.s,
+					    msg[pf].msg_years_only.p,
+					    rd.years), rd.years);
 			strbuf_addf(timebuf,
-				 Q_("%s, %lu month ago", "%s, %lu months ago", months),
-				 sb.buf, months);
+				    Q_(msg[pf].msg_years_months.s,
+				       msg[pf].msg_years_months.p,
+				       rd.months),
+				    sb.buf, rd.months);
 			strbuf_release(&sb);
-		} else
+		} else {
 			strbuf_addf(timebuf,
-				 Q_("%lu year ago", "%lu years ago", years), years);
-		return;
+				    Q_(msg[pf].msg_years.s, msg[pf].msg_years.p,
+				       rd.years), rd.years);
+		}
+		break;
 	}
-	/* Otherwise, just years. Centuries is probably overkill. */
-	strbuf_addf(timebuf,
-		 Q_("%lu year ago", "%lu years ago", (diff + 183) / 365),
-		 (diff + 183) / 365);
 }
 
 const char *show_date(unsigned long time, int tz, enum date_mode mode)
