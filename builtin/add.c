@@ -390,6 +390,9 @@ int cmd_add(int argc, const char **argv, const char *prefix)
 
 	if (addremove && take_worktree_changes)
 		die(_("-A and -u are mutually incompatible"));
+	/* default "git add pathspec..." to "git add -A pathspec..." */
+	if (!take_worktree_changes && argc)
+		addremove = 1;
 	if (!show_only && ignore_missing)
 		die(_("Option --ignore-missing can only be used together with --dry-run"));
 	if ((addremove || take_worktree_changes) && !argc) {
