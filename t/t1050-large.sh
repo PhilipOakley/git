@@ -163,4 +163,45 @@ test_expect_success 'zip achiving, deflate' '
 	git archive --format=zip HEAD >/dev/null
 '
 
+test_expect_success 'split limit' '
+	test_create_repo split &&
+	(
+		cd split &&
+		git config core.bigfilethreshold 2m &&
+		git config pack.splitsizelimit 1m &&
+
+		test-genrandom "a" $(( 4800 * 1024 )) >split &&
+		git add split &&
+
+		# This should result in a new chunked object "tail"
+		# that shares most of the component blobs in its
+		# early part with "split".
+		cat split >tail &&
+		echo cruft >>tail &&
+		git add tail &&
+
+		# This should result in a new chunked object "head"
+		# that begins with its own unique component blobs
+		# but quickly synchronize and start using the same
+		# component blobs with "split" and "tail", once we
+		# switch to a better chunking heuristics.
+		echo cruft >head &&
+		cat split >>head &&
+		git add head &&
+
+		echo blob >expect &&
+		git cat-file -t :split >actual &&
+		test_cmp expect actual &&
+
+		git cat-file -p :split >actual &&
+		# You probably do not want to use test_cmp here...
+		cmp split actual &&
+
+		mv split expect &&
+		git checkout split &&
+		# You probably do not want to use test_cmp here...
+		cmp expect split
+	)
+'
+
 test_done

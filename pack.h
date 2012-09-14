@@ -3,6 +3,7 @@
 
 #include "object.h"
 #include "csum-file.h"
+#include "varint.h"
 
 /*
  * Packed object header

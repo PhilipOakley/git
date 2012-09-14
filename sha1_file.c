@@ -1334,6 +1334,17 @@ unsigned long unpack_object_header_buffer(const unsigned char *buf,
 		shift += 7;
 	}
 	*sizep = size;
+	if (*type == OBJ_EXT) {
+		const unsigned char *p = buf + used;
+		uintmax_t val = decode_varint(&p);
+
+		if (p == buf + used && !val) {
+			error("bad extended object type");
+			return 0;
+		}
+		*type = val + (OBJ_LAST_BASE_TYPE + 1);
+		used = p - buf;
+	}
 	return used;
 }
 
@@ -1543,20 +1554,14 @@ static off_t get_delta_base(struct packed_git *p,
 	 * is stupid, as then a REF_DELTA would be smaller to store.
 	 */
 	if (type == OBJ_OFS_DELTA) {
-		unsigned used = 0;
-		unsigned char c = base_info[used++];
-		base_offset = c & 127;
-		while (c & 128) {
-			base_offset += 1;
-			if (!base_offset || MSB(base_offset, 7))
-				return 0;  /* overflow */
-			c = base_info[used++];
-			base_offset = (base_offset << 7) + (c & 127);
-		}
-		base_offset = delta_obj_offset - base_offset;
+		const unsigned char *buf = base_info;
+		uintmax_t ofs = decode_varint(&buf);
+		if (!ofs && buf == base_info)
+			return 0; /* overflow */
+		base_offset = delta_obj_offset - ofs;
 		if (base_offset <= 0 || base_offset >= delta_obj_offset)
 			return 0;  /* out of bound */
-		*curpos += used;
+		*curpos += buf - base_info;
 	} else if (type == OBJ_REF_DELTA) {
 		/* The base entry _must_ be in the same pack */
 		base_offset = find_pack_entry_one(base_info, p);
@@ -1661,6 +1666,11 @@ static int packed_object_info(struct packed_git *p, off_t obj_offset,
 		if (sizep)
 			*sizep = size;
 		break;
+	case OBJ_CHUNKED_BLOB:
+		if (sizep)
+			*sizep = size;
+		type = OBJ_DEKNUHC(type);
+		break;
 	default:
 		error("unknown object type %i at offset %"PRIuMAX" in %s",
 		      type, (uintmax_t)obj_offset, p->pack_name);
@@ -1699,6 +1709,57 @@ static void *unpack_compressed_entry(struct packed_git *p,
 		return NULL;
 	}
 
+	return buffer;
+}
+
+static void *unpack_chunked_entry(struct packed_git *p,
+				  struct pack_window **w_curs,
+				  off_t curpos,
+				  unsigned long size)
+{
+	/*
+	 * *NOTE* *NOTE* *NOTE*
+	 *
+	 * In the longer term, we should aim to exercise this codepath
+	 * less and less often, as it defeats the whole purpose of
+	 * chuncked object encoding!
+	 */
+	unsigned char *buffer;
+	const unsigned char *in, *ptr;
+	unsigned long avail, ofs;
+	int chunk_cnt;
+
+	buffer = xmallocz(size);
+	in = use_pack(p, w_curs, curpos, &avail);
+	ptr = in;
+	chunk_cnt = decode_varint(&ptr);
+	curpos += ptr - in;
+	ofs = 0;
+	while (chunk_cnt--) {
+		unsigned long csize;
+		unsigned char *data;
+		enum object_type type;
+
+		in = use_pack(p, w_curs, curpos, &avail);
+		data = read_sha1_file(in, &type, &csize);
+		if (!data)
+			die("malformed chunked object contents ('%s' does not exist)",
+			    sha1_to_hex(in));
+		if (type != OBJ_BLOB)
+			die("malformed chunked object contents (not a blob)");
+
+		/*
+		 * The sum of the size of component blobs should match
+		 * the resulting object, or something is wrong.
+		 */
+		if ((chunk_cnt && (size < ofs + csize)) ||
+		    (!chunk_cnt && (size != ofs + csize)))
+			die("malformed chunked object contents (sizes do not add up)");
+		memcpy(buffer + ofs, data, csize);
+		ofs += csize;
+		curpos += 20;
+		free(data);
+	}
 	return buffer;
 }
 
@@ -1936,6 +1997,10 @@ void *unpack_entry(struct packed_git *p, off_t obj_offset,
 	case OBJ_BLOB:
 	case OBJ_TAG:
 		data = unpack_compressed_entry(p, &w_curs, curpos, *sizep);
+		break;
+	case OBJ_CHUNKED_BLOB:
+		data = unpack_chunked_entry(p, &w_curs, curpos, *sizep);
+		*type = OBJ_DEKNUHC(*type);
 		break;
 	default:
 		data = NULL;
@@ -2200,6 +2265,9 @@ int sha1_object_info_extended(const unsigned char *sha1, struct object_info *oi)
 		oi->u.packed.pack = e.p;
 		oi->u.packed.is_delta = (rtype == OBJ_REF_DELTA ||
 					 rtype == OBJ_OFS_DELTA);
+		oi->u.packed.is_chunked =
+			(OBJ_CHUNKED_BLOB <= rtype &&
+			 rtype <= OBJ_CHUNKED_BLOB);
 	}
 
 	return status;

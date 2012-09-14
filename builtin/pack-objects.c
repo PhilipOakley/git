@@ -245,7 +245,7 @@ static unsigned long write_no_reuse_object(struct sha1file *f, struct object_ent
 					   unsigned long limit, int usable_delta)
 {
 	unsigned long size, datalen;
-	unsigned char header[10], dheader[10];
+	unsigned char header[10];
 	unsigned hdrlen;
 	enum object_type type;
 	void *buf;
@@ -301,19 +301,18 @@ static unsigned long write_no_reuse_object(struct sha1file *f, struct object_ent
 		 * base from this object's position in the pack.
 		 */
 		off_t ofs = entry->idx.offset - entry->delta->idx.offset;
-		unsigned pos = sizeof(dheader) - 1;
-		dheader[pos] = ofs & 127;
-		while (ofs >>= 7)
-			dheader[--pos] = 128 | (--ofs & 127);
-		if (limit && hdrlen + sizeof(dheader) - pos + datalen + 20 >= limit) {
+		unsigned char dheader[10];
+		unsigned pos = encode_varint(ofs, dheader);
+
+		if (limit && hdrlen + pos + datalen + 20 >= limit) {
 			if (st)
 				close_istream(st);
 			free(buf);
 			return 0;
 		}
 		sha1write(f, header, hdrlen);
-		sha1write(f, dheader + pos, sizeof(dheader) - pos);
-		hdrlen += sizeof(dheader) - pos;
+		sha1write(f, dheader, pos);
+		hdrlen += pos;
 	} else if (type == OBJ_REF_DELTA) {
 		/*
 		 * Deltas with a base reference contain
@@ -358,7 +357,7 @@ static unsigned long write_reuse_object(struct sha1file *f, struct object_entry 
 	off_t offset;
 	enum object_type type = entry->type;
 	unsigned long datalen;
-	unsigned char header[10], dheader[10];
+	unsigned char header[10];
 	unsigned hdrlen;
 
 	if (entry->delta)
@@ -388,17 +387,16 @@ static unsigned long write_reuse_object(struct sha1file *f, struct object_entry 
 
 	if (type == OBJ_OFS_DELTA) {
 		off_t ofs = entry->idx.offset - entry->delta->idx.offset;
-		unsigned pos = sizeof(dheader) - 1;
-		dheader[pos] = ofs & 127;
-		while (ofs >>= 7)
-			dheader[--pos] = 128 | (--ofs & 127);
-		if (limit && hdrlen + sizeof(dheader) - pos + datalen + 20 >= limit) {
+		unsigned char dheader[10];
+		unsigned pos = encode_varint(ofs, dheader);
+
+		if (limit && hdrlen + pos + datalen + 20 >= limit) {
 			unuse_pack(&w_curs);
 			return 0;
 		}
 		sha1write(f, header, hdrlen);
-		sha1write(f, dheader + pos, sizeof(dheader) - pos);
-		hdrlen += sizeof(dheader) - pos;
+		sha1write(f, dheader, pos);
+		hdrlen += pos;
 		reused_delta++;
 	} else if (type == OBJ_REF_DELTA) {
 		if (limit && hdrlen + 20 + datalen + 20 >= limit) {

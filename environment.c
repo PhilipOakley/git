@@ -61,6 +61,7 @@ int merge_log_config = -1;
 int precomposed_unicode = -1; /* see probe_utf8_pathname_composition() */
 struct startup_info *startup_info;
 unsigned long pack_size_limit_cfg;
+unsigned long split_size_limit_cfg;
 
 /* Parallel index stat data preload? */
 int core_preload_index = 0;
