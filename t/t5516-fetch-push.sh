@@ -929,6 +929,39 @@ test_expect_success 'push into aliased refs (inconsistent)' '
 	)
 '
 
+test_expect_success 'push all hierarchies with stash' '
+	mk_empty &&
+	git stash clear &&
+	git reset --hard &&
+	echo >>path1 &&
+	git stash save "Tweak path1" &&
+	git push testrepo "refs/*:refs/*" &&
+	# without fix to connect.c::check_ref(), the second push
+	# would fail.
+	git push testrepo refs/stash &&
+	git ls-remote . >expect &&
+	git ls-remote testrepo >actual &&
+	test_cmp actual expect
+'
+
+test_expect_success 'fetch all hierarchies with stash' '
+	mk_empty &&
+	git stash clear &&
+	git reset --hard &&
+	echo >>path1 &&
+	git stash save "Tweak path1" &&
+	(
+		cd testrepo &&
+		git commit --allow-empty -m initial &&
+		git checkout HEAD^0 &&
+		git fetch .. "+refs/*:refs/*" &&
+		git checkout master
+	) &&
+	git ls-remote . >expect &&
+	git ls-remote testrepo >actual &&
+	test_cmp actual expect
+'
+
 test_expect_success 'push --porcelain' '
 	mk_empty &&
 	echo >.git/foo  "To testrepo" &&
