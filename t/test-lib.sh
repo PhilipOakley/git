@@ -553,17 +553,17 @@ fi
 test="trash directory.$(basename "$0" .sh)"
 test -n "$root" && test="$root/$test"
 case "$test" in
-/*) TRASH_DIRECTORY="$test" ;;
- *) TRASH_DIRECTORY="$TEST_OUTPUT_DIRECTORY/$test" ;;
+/*) ;;
+ *) test="$TEST_OUTPUT_DIRECTORY/$test" ;;
 esac
-test ! -z "$debug" || remove_trash=$TRASH_DIRECTORY
+test ! -z "$debug" || remove_trash=$test
 rm -fr "$test" || {
 	GIT_EXIT_OK=t
 	echo >&5 "FATAL: Cannot prepare test area"
 	exit 1
 }
 
-HOME="$TRASH_DIRECTORY"
+HOME="$test"
 export HOME
 
 if test -z "$TEST_NO_CREATE_REPO"
@@ -575,6 +575,7 @@ fi
 # Use -P to resolve symlinks in our working directory so that the cwd
 # in subprocesses like git equals our $PWD (for pathname comparisons).
 cd -P "$test" || exit 1
+TRASH_DIRECTORY="$(pwd)"
 
 this_test=${0##*/}
 this_test=${this_test%%-*}
