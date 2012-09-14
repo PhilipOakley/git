@@ -11,11 +11,15 @@ CFLAGS = -g -O2 -Wall
 INCS:=$(shell pkg-config --cflags gnome-keyring-1)
 LIBS:=$(shell pkg-config --libs gnome-keyring-1)
 
+HELPER:=../helper
+VPATH +=$(HELPER)
+
 SRCS:=$(MAIN).c
+SRCS+=credential_helper.c
 OBJS:=$(SRCS:.c=.o)
 
 %.o: %.c
-	$(CC) $(CFLAGS) $(CPPFLAGS) $(INCS) -o $@ -c $<
+	$(CC) $(CFLAGS) $(CPPFLAGS) -I$(HELPER) $(INCS) -o $@ -c $<
 
 $(MAIN): $(OBJS)
 	$(CC) -o $@ $(LDFLAGS) $^ $(LIBS)

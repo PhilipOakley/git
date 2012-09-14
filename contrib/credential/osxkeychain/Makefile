@@ -1,4 +1,5 @@
-all:: git-credential-osxkeychain
+MAIN:=git-credential-osxkeychain
+all:: $(MAIN)
 
 CC = gcc
 RM = rm -f
@@ -7,11 +8,20 @@ CFLAGS = -g -O2 -Wall
 -include ../../../config.mak.autogen
 -include ../../../config.mak
 
-git-credential-osxkeychain: git-credential-osxkeychain.o
-	$(CC) $(CFLAGS) -o $@ $< $(LDFLAGS) -Wl,-framework -Wl,Security
+INCS:=
+LIBS:=-Wl,-framework -Wl,Security
+HELPER:=../helper
+VPATH +=$(HELPER)
 
-git-credential-osxkeychain.o: git-credential-osxkeychain.c
-	$(CC) -c $(CFLAGS) $<
+SRCS:=$(MAIN).c
+SRCS+=credential_helper.c
+OBJS:=$(SRCS:.c=.o)
+
+%.o: %.c
+	$(CC) $(CFLAGS) $(CPPFLAGS) -I$(HELPER) $(INCS) -o $@ -c $<
+
+$(MAIN): $(OBJS)
+	$(CC) -o $@ $(LDFLAGS) $^ $(LIBS)
 
 clean:
-	$(RM) git-credential-osxkeychain git-credential-osxkeychain.o
+	@$(RM) $(MAIN) $(OBJS)

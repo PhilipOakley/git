@@ -1,53 +1,40 @@
+
+#include <credential_helper.h>
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <Security/Security.h>
 
 static SecProtocolType protocol;
-static char *host;
-static char *path;
-static char *username;
-static char *password;
-static UInt16 port;
-
-static void die(const char *err, ...)
-{
-	char msg[4096];
-	va_list params;
-	va_start(params, err);
-	vsnprintf(msg, sizeof(msg), err, params);
-	fprintf(stderr, "%s\n", msg);
-	va_end(params);
-	exit(1);
-}
-
-static void *xstrdup(const char *s1)
-{
-	void *ret = strdup(s1);
-	if (!ret)
-		die("Out of memory");
-	return ret;
-}
 
 #define KEYCHAIN_ITEM(x) (x ? strlen(x) : 0), x
-#define KEYCHAIN_ARGS \
+#define KEYCHAIN_ARGS(c) \
 	NULL, /* default keychain */ \
-	KEYCHAIN_ITEM(host), \
+	KEYCHAIN_ITEM(c->host), \
 	0, NULL, /* account domain */ \
-	KEYCHAIN_ITEM(username), \
-	KEYCHAIN_ITEM(path), \
-	port, \
+	KEYCHAIN_ITEM(c->username), \
+	KEYCHAIN_ITEM(c->path), \
+	(UInt16) c->port, \
 	protocol, \
 	kSecAuthenticationTypeDefault
 
-static void write_item(const char *what, const char *buf, int len)
+static int prepare_internet_password(struct credential *c)
 {
-	printf("%s=", what);
-	fwrite(buf, 1, len, stdout);
-	putchar('\n');
+	if (!c->protocol)
+		return -1;
+	else if (!strcmp(c->protocol, "https"))
+		protocol = kSecProtocolTypeHTTPS;
+	else if (!strcmp(c->protocol, "http"))
+		protocol = kSecProtocolTypeHTTP;
+	else /* we don't yet handle other protocols */
+		return -1;
+
+	return 0;
 }
 
-static void find_username_in_item(SecKeychainItemRef item)
+static void
+find_username_in_item(SecKeychainItemRef item, struct credential *c)
 {
 	SecKeychainAttributeList list;
 	SecKeychainAttribute attr;
@@ -59,27 +46,37 @@ static void find_username_in_item(SecKeychainItemRef item)
 	if (SecKeychainItemCopyContent(item, NULL, &list, NULL, NULL))
 		return;
 
-	write_item("username", attr.data, attr.length);
+	free(c->username);
+	c->username = xstrndup(attr.data, attr.length);
+
 	SecKeychainItemFreeContent(&list, NULL);
 }
 
-static void find_internet_password(void)
+static int find_internet_password(struct credential *c)
 {
 	void *buf;
 	UInt32 len;
 	SecKeychainItemRef item;
 
-	if (SecKeychainFindInternetPassword(KEYCHAIN_ARGS, &len, &buf, &item))
-		return;
+	/* Silently ignore unsupported protocols */
+	if (prepare_internet_password(c))
+		return EXIT_SUCCESS;
 
-	write_item("password", buf, len);
-	if (!username)
-		find_username_in_item(item);
+	if (SecKeychainFindInternetPassword(KEYCHAIN_ARGS(c), &len, &buf, &item))
+		return EXIT_SUCCESS;
+
+	free_password(c->password);
+	c->password = xstrndup(buf, len);
+	memset(buf,len,'\0');
+
+	if (!c->username)
+		find_username_in_item(item, c);
 
 	SecKeychainItemFreeContent(NULL, buf);
+	return EXIT_SUCCESS;
 }
 
-static void delete_internet_password(void)
+static int delete_internet_password(struct credential *c)
 {
 	SecKeychainItemRef item;
 
@@ -88,86 +85,48 @@ static void delete_internet_password(void)
 	 * will give us; if you want to do something more fancy, use the
 	 * Keychain manager.
 	 */
-	if (!protocol || !host)
-		return;
+	if (!c->protocol || !c->host)
+		return EXIT_FAILURE;
 
-	if (SecKeychainFindInternetPassword(KEYCHAIN_ARGS, 0, NULL, &item))
-		return;
+	/* Silently ignore unsupported protocols */
+	if (prepare_internet_password(c))
+		return EXIT_SUCCESS;
 
-	SecKeychainItemDelete(item);
+	if (SecKeychainFindInternetPassword(KEYCHAIN_ARGS(c), 0, NULL, &item))
+		return EXIT_SUCCESS;
+
+	if (!SecKeychainItemDelete(item))
+		return EXIT_SUCCESS;
+
+	return EXIT_FAILURE;
 }
 
-static void add_internet_password(void)
+static int add_internet_password(struct credential *c)
 {
 	/* Only store complete credentials */
-	if (!protocol || !host || !username || !password)
-		return;
+	if (!c->protocol || !c->host || !c->username || !c->password)
+		return EXIT_FAILURE;
+
+	if (prepare_internet_password(c))
+		return EXIT_FAILURE;
 
 	if (SecKeychainAddInternetPassword(
-	      KEYCHAIN_ARGS,
-	      KEYCHAIN_ITEM(password),
+	      KEYCHAIN_ARGS(c),
+	      KEYCHAIN_ITEM(c->password),
 	      NULL))
-		return;
+		return EXIT_FAILURE;
+
+	return EXIT_SUCCESS;
 }
 
-static void read_credential(void)
+/*
+ * Table with helper operation callbacks, used by generic
+ * credential helper main function.
+ */
+struct credential_operation const credential_helper_ops[] =
 {
-	char buf[1024];
-
-	while (fgets(buf, sizeof(buf), stdin)) {
-		char *v;
-
-		if (!strcmp(buf, "\n"))
-			break;
-		buf[strlen(buf)-1] = '\0';
-
-		v = strchr(buf, '=');
-		if (!v)
-			die("bad input: %s", buf);
-		*v++ = '\0';
-
-		if (!strcmp(buf, "protocol")) {
-			if (!strcmp(v, "https"))
-				protocol = kSecProtocolTypeHTTPS;
-			else if (!strcmp(v, "http"))
-				protocol = kSecProtocolTypeHTTP;
-			else /* we don't yet handle other protocols */
-				exit(0);
-		}
-		else if (!strcmp(buf, "host")) {
-			char *colon = strchr(v, ':');
-			if (colon) {
-				*colon++ = '\0';
-				port = atoi(colon);
-			}
-			host = xstrdup(v);
-		}
-		else if (!strcmp(buf, "path"))
-			path = xstrdup(v);
-		else if (!strcmp(buf, "username"))
-			username = xstrdup(v);
-		else if (!strcmp(buf, "password"))
-			password = xstrdup(v);
-	}
-}
-
-int main(int argc, const char **argv)
-{
-	const char *usage =
-		"Usage: git credential-osxkeychain <get|store|erase>";
-
-	if (!argv[1])
-		die(usage);
-
-	read_credential();
-
-	if (!strcmp(argv[1], "get"))
-		find_internet_password();
-	else if (!strcmp(argv[1], "store"))
-		add_internet_password();
-	else if (!strcmp(argv[1], "erase"))
-		delete_internet_password();
-	/* otherwise, ignore unknown action */
-
-	return 0;
-}
+	{ "get",   find_internet_password   },
+	{ "store", add_internet_password    },
+	{ "erase", delete_internet_password },
+	CREDENTIAL_OP_END
+};

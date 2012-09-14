@@ -6,37 +6,7 @@
 #include <stdio.h>
 #include <io.h>
 #include <fcntl.h>
-
-/* common helpers */
-
-static void die(const char *err, ...)
-{
-	char msg[4096];
-	va_list params;
-	va_start(params, err);
-	vsnprintf(msg, sizeof(msg), err, params);
-	fprintf(stderr, "%s\n", msg);
-	va_end(params);
-	exit(1);
-}
-
-static void *xmalloc(size_t size)
-{
-	void *ret = malloc(size);
-	if (!ret && !size)
-		ret = malloc(1);
-	if (!ret)
-		 die("Out of memory");
-	return ret;
-}
-
-static char *xstrdup(const char *str)
-{
-	char *ret = strdup(str);
-	if (!ret)
-		die("Out of memory");
-	return ret;
-}
+#include <credential_helper.h>
 
 /* MinGW doesn't have wincred.h, so we need to define stuff */
 
@@ -84,13 +54,16 @@ static CredPackAuthenticationBufferWT CredPackAuthenticationBufferW;
 static CredFreeT CredFree;
 static CredDeleteWT CredDeleteW;
 
-static void load_cred_funcs(void)
+
+static int load_cred_funcs(void)
 {
 	/* load DLLs */
 	advapi = LoadLibrary("advapi32.dll");
 	credui = LoadLibrary("credui.dll");
-	if (!advapi || !credui)
-		die("failed to load DLLs");
+	if (!advapi || !credui) {
+		error("failed to load DLLs");
+		return EXIT_FAILURE;
+	}
 
 	/* get function pointers */
 	CredWriteW = (CredWriteWT)GetProcAddress(advapi, "CredWriteW");
@@ -104,28 +77,57 @@ static void load_cred_funcs(void)
 	CredDeleteW = (CredDeleteWT)GetProcAddress(advapi, "CredDeleteW");
 	if (!CredWriteW || !CredUnPackAuthenticationBufferW ||
 	    !CredEnumerateW || !CredPackAuthenticationBufferW || !CredFree ||
-	    !CredDeleteW)
-		die("failed to load functions");
+	    !CredDeleteW) {
+		error("failed to load functions");
+		return EXIT_FAILURE;
+	}
+	return EXIT_SUCCESS;
 }
 
 static char target_buf[1024];
-static char *protocol, *host, *path, *username;
-static WCHAR *wusername, *password, *target;
+static char port_buf[8];
+static WCHAR *wusername, *wpassword;
 
-static void write_item(const char *what, WCHAR *wbuf)
+static WCHAR *utf8_to_utf16_dup(const char *str)
 {
-	char *buf;
-	int len = WideCharToMultiByte(CP_UTF8, 0, wbuf, -1, NULL, 0, NULL,
-	    FALSE);
-	buf = xmalloc(len);
+	int wlen = MultiByteToWideChar(CP_UTF8, 0, str, -1, NULL, 0);
+	WCHAR *wstr = xmalloc(sizeof(WCHAR) * wlen);
+	if (!MultiByteToWideChar(CP_UTF8, 0, str, -1, wstr, wlen))
+		die("MultiByteToWideChar failed");
+	return wstr;
+}
 
-	if (!WideCharToMultiByte(CP_UTF8, 0, wbuf, -1, buf, len, NULL, FALSE))
-		die("WideCharToMultiByte failed!");
+static char *utf16_to_utf8_dup(const WCHAR *wstr)
+{
+	int len = WideCharToMultiByte(CP_UTF8, 0, wstr, -1, NULL, 0, NULL,
+		FALSE);
+	char *str = xmalloc(len);
+	if (!WideCharToMultiByte(CP_UTF8, 0, wstr, -1, str, len, NULL, FALSE))
+		die("WideCharToMultiByte failed");
+	return str;
+}
 
-	printf("%s=", what);
-	fwrite(buf, 1, len - 1, stdout);
-	putchar('\n');
-	free(buf);
+static void free_wpassword(WCHAR *pass)
+{
+	WCHAR *w = pass;
+	if(!pass)
+		return;
+	while(*w) *w++ = L'\0';
+	free(pass);
+}
+
+static int prepare_credential(struct credential *c)
+{
+	if (load_cred_funcs() )
+		return EXIT_FAILURE;
+
+	if (c->username)
+		wusername = utf8_to_utf16_dup(c->username);
+	if (c->password)
+		wpassword = utf8_to_utf16_dup(c->password);
+	if (c->port)
+		snprintf(port_buf, sizeof(port_buf), "%hd", c->port);
+	return EXIT_SUCCESS;
 }
 
 static int match_attr(const CREDENTIALW *cred, const WCHAR *keyword,
@@ -143,33 +145,37 @@ static int match_attr(const CREDENTIALW *cred, const WCHAR *keyword,
 	return 0; /* not found */
 }
 
-static int match_cred(const CREDENTIALW *cred)
+static int match_cred(const CREDENTIALW *cred, const struct credential *c)
 {
 	return (!wusername || !wcscmp(wusername, cred->UserName)) &&
-	    match_attr(cred, L"git_protocol", protocol) &&
-	    match_attr(cred, L"git_host", host) &&
-	    match_attr(cred, L"git_path", path);
+	    match_attr(cred, L"git_protocol", c->protocol) &&
+	    match_attr(cred, L"git_host", c->host) &&
+	    (!c->port || match_attr(cred, L"git_port", port_buf)) &&
+	    match_attr(cred, L"git_path", c->path);
 }
 
-static void get_credential(void)
+static int get_credential(struct credential *c)
 {
-	WCHAR *user_buf, *pass_buf;
+	WCHAR *user_buf = NULL, *pass_buf = NULL;
 	DWORD user_buf_size = 0, pass_buf_size = 0;
 	CREDENTIALW **creds, *cred = NULL;
 	DWORD num_creds;
-	int i;
+	int i, ret = EXIT_SUCCESS;
+
+	if (prepare_credential(c))
+		return EXIT_FAILURE;
 
 	if (!CredEnumerateW(L"git:*", 0, &num_creds, &creds))
-		return;
+		return EXIT_FAILURE;
 
 	/* search for the first credential that matches username */
 	for (i = 0; i < num_creds; ++i)
-		if (match_cred(creds[i])) {
+		if (match_cred(creds[i], c)) {
 			cred = creds[i];
 			break;
 		}
 	if (!cred)
-		return;
+		goto out;
 
 	CredUnPackAuthenticationBufferW(0, cred->CredentialBlob,
 	    cred->CredentialBlobSize, NULL, &user_buf_size, NULL, NULL,
@@ -180,20 +186,29 @@ static void get_credential(void)
 
 	if (!CredUnPackAuthenticationBufferW(0, cred->CredentialBlob,
 	    cred->CredentialBlobSize, user_buf, &user_buf_size, NULL, NULL,
-	    pass_buf, &pass_buf_size))
-		die("CredUnPackAuthenticationBuffer failed");
-
-	CredFree(creds);
+	    pass_buf, &pass_buf_size)) {
+		error("CredUnPackAuthenticationBuffer failed");
+		ret = EXIT_FAILURE;
+		goto out;
+	}
 
 	/* zero-terminate (sizes include zero-termination) */
 	user_buf[user_buf_size - 1] = L'\0';
 	pass_buf[pass_buf_size - 1] = L'\0';
 
-	write_item("username", user_buf);
-	write_item("password", pass_buf);
+	if (!c->username)
+		c->username = utf16_to_utf8_dup(user_buf);
+	free_password(c->password);
+	c->password = utf16_to_utf8_dup(pass_buf);
+
+out:
+	CredFree(creds);
 
 	free(user_buf);
-	free(pass_buf);
+	free(wusername);
+	free_wpassword(pass_buf);
+
+	return ret;
 }
 
 static void write_attr(CREDENTIAL_ATTRIBUTEW *attr, const WCHAR *keyword,
@@ -205,29 +220,42 @@ static void write_attr(CREDENTIAL_ATTRIBUTEW *attr, const WCHAR *keyword,
 	attr->Value = (LPBYTE)value;
 }
 
-static void store_credential(void)
+static int store_credential(struct credential *c)
 {
 	CREDENTIALW cred;
 	BYTE *auth_buf;
 	DWORD auth_buf_size = 0;
 	CREDENTIAL_ATTRIBUTEW attrs[CRED_MAX_ATTRIBUTES];
+	WCHAR *wtarget;
+	int ret = EXIT_SUCCESS;
 
-	if (!wusername || !password)
-		return;
+	if (prepare_credential(c))
+		return EXIT_FAILURE;
+
+	if (!wusername || !wpassword)
+		return EXIT_FAILURE;
+
+	/* prepare 'target', the unique key for the credential */
+	strncat(target_buf,"git:",sizeof(target_buf));
+	strncat(target_buf,c->url,sizeof(target_buf));
+	wtarget = utf8_to_utf16_dup(target_buf);
 
 	/* query buffer size */
-	CredPackAuthenticationBufferW(0, wusername, password,
+	CredPackAuthenticationBufferW(0, wusername, wpassword,
 	    NULL, &auth_buf_size);
 
 	auth_buf = xmalloc(auth_buf_size);
 
-	if (!CredPackAuthenticationBufferW(0, wusername, password,
-	    auth_buf, &auth_buf_size))
-		die("CredPackAuthenticationBuffer failed");
+	if (!CredPackAuthenticationBufferW(0, wusername, wpassword,
+	    auth_buf, &auth_buf_size)) {
+		error("CredPackAuthenticationBuffer failed");
+		ret = EXIT_FAILURE;
+		goto out;
+	}
 
 	cred.Flags = 0;
 	cred.Type = CRED_TYPE_GENERIC;
-	cred.TargetName = target;
+	cred.TargetName = wtarget;
 	cred.Comment = L"saved by git-credential-wincred";
 	cred.CredentialBlobSize = auth_buf_size;
 	cred.CredentialBlob = auth_buf;
@@ -237,121 +265,65 @@ static void store_credential(void)
 	cred.TargetAlias = NULL;
 	cred.UserName = wusername;
 
-	write_attr(attrs, L"git_protocol", protocol);
+	write_attr(attrs, L"git_protocol", c->protocol);
 
-	if (host) {
-		write_attr(attrs + cred.AttributeCount, L"git_host", host);
+	if (c->host) {
+		write_attr(attrs + cred.AttributeCount, L"git_host", c->host);
 		cred.AttributeCount++;
 	}
 
-	if (path) {
-		write_attr(attrs + cred.AttributeCount, L"git_path", path);
+	if (c->port) {
+		write_attr(attrs + cred.AttributeCount, L"git_port", port_buf);
 		cred.AttributeCount++;
 	}
 
-	if (!CredWriteW(&cred, 0))
-		die("CredWrite failed");
+	if (c->path) {
+		write_attr(attrs + cred.AttributeCount, L"git_path", c->path);
+		cred.AttributeCount++;
+	}
+
+	if (!CredWriteW(&cred, 0)) {
+		error("CredWrite failed");
+		ret = EXIT_FAILURE;
+	}
+
+out:
+	free(auth_buf);
+	free(wusername);
+	free_wpassword(wpassword);
+	free(wtarget);
+	return ret;
 }
 
-static void erase_credential(void)
+static int erase_credential(struct credential *c)
 {
 	CREDENTIALW **creds;
 	DWORD num_creds;
 	int i;
 
+	if (prepare_credential(c))
+		return EXIT_FAILURE;
+
 	if (!CredEnumerateW(L"git:*", 0, &num_creds, &creds))
-		return;
+		return EXIT_FAILURE;
 
 	for (i = 0; i < num_creds; ++i) {
-		if (match_cred(creds[i]))
+		if (match_cred(creds[i],c))
 			CredDeleteW(creds[i]->TargetName, creds[i]->Type, 0);
 	}
 
 	CredFree(creds);
+	return EXIT_SUCCESS;
 }
 
-static WCHAR *utf8_to_utf16_dup(const char *str)
+/*
+ * Table with helper operation callbacks, used by generic
+ * credential helper main function.
+ */
+struct credential_operation const credential_helper_ops[] =
 {
-	int wlen = MultiByteToWideChar(CP_UTF8, 0, str, -1, NULL, 0);
-	WCHAR *wstr = xmalloc(sizeof(WCHAR) * wlen);
-	MultiByteToWideChar(CP_UTF8, 0, str, -1, wstr, wlen);
-	return wstr;
-}
-
-static void read_credential(void)
-{
-	char buf[1024];
-
-	while (fgets(buf, sizeof(buf), stdin)) {
-		char *v;
-
-		if (!strcmp(buf, "\n"))
-			break;
-		buf[strlen(buf)-1] = '\0';
-
-		v = strchr(buf, '=');
-		if (!v)
-			die("bad input: %s", buf);
-		*v++ = '\0';
-
-		if (!strcmp(buf, "protocol"))
-			protocol = xstrdup(v);
-		else if (!strcmp(buf, "host"))
-			host = xstrdup(v);
-		else if (!strcmp(buf, "path"))
-			path = xstrdup(v);
-		else if (!strcmp(buf, "username")) {
-			username = xstrdup(v);
-			wusername = utf8_to_utf16_dup(v);
-		} else if (!strcmp(buf, "password"))
-			password = utf8_to_utf16_dup(v);
-		else
-			die("unrecognized input");
-	}
-}
-
-int main(int argc, char *argv[])
-{
-	const char *usage =
-	    "Usage: git credential-wincred <get|store|erase>\n";
-
-	if (!argv[1])
-		die(usage);
-
-	/* git use binary pipes to avoid CRLF-issues */
-	_setmode(_fileno(stdin), _O_BINARY);
-	_setmode(_fileno(stdout), _O_BINARY);
-
-	read_credential();
-
-	load_cred_funcs();
-
-	if (!protocol || !(host || path))
-		return 0;
-
-	/* prepare 'target', the unique key for the credential */
-	strncat(target_buf, "git:", sizeof(target_buf));
-	strncat(target_buf, protocol, sizeof(target_buf));
-	strncat(target_buf, "://", sizeof(target_buf));
-	if (username) {
-		strncat(target_buf, username, sizeof(target_buf));
-		strncat(target_buf, "@", sizeof(target_buf));
-	}
-	if (host)
-		strncat(target_buf, host, sizeof(target_buf));
-	if (path) {
-		strncat(target_buf, "/", sizeof(target_buf));
-		strncat(target_buf, path, sizeof(target_buf));
-	}
-
-	target = utf8_to_utf16_dup(target_buf);
-
-	if (!strcmp(argv[1], "get"))
-		get_credential();
-	else if (!strcmp(argv[1], "store"))
-		store_credential();
-	else if (!strcmp(argv[1], "erase"))
-		erase_credential();
-	/* otherwise, ignore unknown action */
-	return 0;
-}
+	{ "get",   get_credential   },
+	{ "store", store_credential },
+	{ "erase", erase_credential },
+	CREDENTIAL_OP_END
+};
