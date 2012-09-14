@@ -9,13 +9,13 @@ git-name-rev - Find symbolic names for given revs
 SYNOPSIS
 --------
 [verse]
-'git name-rev' [--tags] [--refs=<pattern>]
+'git name-rev' [--tags] [--refs=<pattern>] [--weight]
 	       ( --all | --stdin | <committish>... )
 
 DESCRIPTION
 -----------
-Finds symbolic names suitable for human digestion for revisions given in any
-format parsable by 'git rev-parse'.
+Finds symbolic names suitable for human digestion for revisions
+given in any format parsable by 'git rev-parse'.
 
 
 OPTIONS
@@ -46,6 +46,14 @@ OPTIONS
 
 --always::
 	Show uniquely abbreviated commit object as fallback.
+
+--weight::
+	Name commits based on the oldest ref that contains it.  This
+	is way more expensive than the default behaviour of the
+	command, in which commits are named based on the ref that
+	is topologically the closest, but gives more intuitive
+	answer to the question: what is the oldest tag that contains
+	this commit?
 
 EXAMPLE
 -------
