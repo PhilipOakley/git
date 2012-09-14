@@ -40,7 +40,13 @@ test_expect_success 'ls-remote self' '
 '
 
 test_expect_success 'dies when no remote specified and no default remotes found' '
-	test_must_fail git ls-remote
+	test_create_repo no-remotes &&
+	(
+		cd no-remotes &&
+		test_must_fail git ls-remote &&
+		test_config remote.default blop &&
+		test_must_fail git ls-remote
+	)
 '
 
 test_expect_success 'use "origin" when no remote specified' '

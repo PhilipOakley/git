@@ -12,6 +12,7 @@ static const char * const builtin_remote_usage[] = {
 	N_("git remote add [-t <branch>] [-m <master>] [-f] [--tags|--no-tags] [--mirror=<fetch|push>] <name> <url>"),
 	N_("git remote rename <old> <new>"),
 	N_("git remote remove <name>"),
+	N_("git remote default [<name>]"),
 	N_("git remote set-head <name> (-a | -d | <branch>)"),
 	N_("git remote [-v | --verbose] show [-n] <name>"),
 	N_("git remote prune [-n | --dry-run] <name>"),
@@ -197,6 +198,9 @@ static int add(int argc, const char **argv)
 	strbuf_addf(&buf2, "refs/heads/test:refs/remotes/%s/test", name);
 	if (!valid_fetch_refspec(buf2.buf))
 		die(_("'%s' is not a valid remote name"), name);
+
+	if (remote_count() == 1) /* remote_get() adds a remote if it's new */
+		git_config_set("remote.default", name);
 
 	strbuf_addf(&buf, "remote.%s.url", name);
 	if (git_config_set(buf.buf, url))
@@ -656,6 +660,10 @@ static int mv(int argc, const char **argv)
 		return error(_("Could not rename config section '%s' to '%s'"),
 				buf.buf, buf2.buf);
 
+	if (!strcmp(oldremote->name, remote_get_default_name())) {
+		git_config_set("remote.default", newremote->name);
+	}
+
 	strbuf_reset(&buf);
 	strbuf_addf(&buf, "remote.%s.fetch", rename.new);
 	if (git_config_set_multivar(buf.buf, NULL, NULL, 1))
@@ -798,6 +806,10 @@ static int rm(int argc, const char **argv)
 	if (git_config_rename_section(buf.buf, NULL) < 1)
 		return error(_("Could not remove config section '%s'"), buf.buf);
 
+	if (!strcmp(remote->name, remote_get_default_name())) {
+		git_config_set("remote.default", NULL);
+	}
+
 	read_branches();
 	for (i = 0; i < branch_list.nr; i++) {
 		struct string_list_item *item = branch_list.items + i;
@@ -843,6 +855,21 @@ static int rm(int argc, const char **argv)
 	string_list_clear(&skipped, 0);
 
 	return result;
+}
+
+static int deflt(int argc, const char **argv)
+{
+	if (argc < 2)
+		printf_ln("%s", remote_get_default_name());
+	else {
+		const char *name = argv[1];
+		if (remote_is_configured(name)) {
+			git_config_set("remote.default", name);
+			printf_ln(_("Default remote set to '%s'."), name);
+		} else
+			return error(_("No remote named '%s'."), name);
+	}
+	return 0;
 }
 
 static void clear_push_info(void *util, const char *string)
@@ -1582,6 +1609,8 @@ int cmd_remote(int argc, const char **argv, const char *prefix)
 		result = mv(argc, argv);
 	else if (!strcmp(argv[0], "rm") || !strcmp(argv[0], "remove"))
 		result = rm(argc, argv);
+	else if (!strcmp(argv[0], "default"))
+		result = deflt(argc, argv);
 	else if (!strcmp(argv[0], "set-head"))
 		result = set_head(argc, argv);
 	else if (!strcmp(argv[0], "set-branches"))

@@ -1883,6 +1883,14 @@ remote.<name>.vcs::
 	Setting this to a value <vcs> will cause git to interact with
 	the remote with the git-remote-<vcs> helper.
 
+remote.default::
+	This value is the <name> of a remote.  When Git needs to automatically
+	choose a remote to use, it first tries the 'branch.<branchname>.remote'
+	value of the currently checked-out branch.  If the currently checked-out
+	branch has no remote, Git uses the remote named by 'remote.default', or
+	the remote named "origin" if no value is set (even if there is no
+	actual remote named "origin").
+
 remotes.<group>::
 	The list of remotes which are fetched by "git remote update
 	<group>".  See linkgit:git-remote[1].

@@ -57,6 +57,16 @@ test_expect_success 'clone checks out files' '
 
 '
 
+test_expect_success 'clone sets remote.default' '
+
+	rm -fr dst &&
+	git clone src dst &&
+	(
+		cd dst &&
+		test "$(git config --get remote.default)" = origin
+	)
+'
+
 test_expect_success 'clone respects GIT_WORK_TREE' '
 
 	GIT_WORK_TREE=worktree git clone src bare &&

@@ -668,6 +668,27 @@ test_expect_success '../bar/a/b/c works with relative local path - ../foo/bar.gi
 	)
 '
 
+test_expect_success 'realtive path works when superproject on detached HEAD' '
+	(
+		test_create_repo detach &&
+		cd detach &&
+		test_create_repo sub &&
+		(
+			cd sub &&
+			test_commit foo
+		) &&
+		git add sub &&
+		git commit -m "added sub" &&
+		rm -rf sub &&
+		git checkout HEAD@{0} &&
+		git config -f .gitmodules submodule.sub.path sub &&
+		git config -f .gitmodules submodule.sub.url ../subrepo &&
+		git remote add awkward /path/to/awkward
+		git submodule init sub &&
+		test "$(git config submodule.sub.url)" = /path/to/subrepo
+	)
+'
+
 test_expect_success 'moving the superproject does not break submodules' '
 	(
 		cd addtest &&

@@ -773,6 +773,8 @@ int cmd_clone(int argc, const char **argv, const char *prefix)
 	git_config_set(key.buf, repo);
 	strbuf_reset(&key);
 
+	git_config_set("remote.default", option_origin);
+
 	if (option_reference.nr)
 		setup_reference();
 

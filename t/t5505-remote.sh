@@ -83,6 +83,15 @@ test_expect_success C_LOCALE_OUTPUT 'check remote tracking' '
 )
 '
 
+test_expect_success 'add first remote sets default' '
+(
+	test_create_repo default-first-remote &&
+	cd default-first-remote &&
+	git remote add first /path/to/first &&
+	test "$(git config --get remote.default)" = first
+)
+'
+
 test_expect_success 'remote forces tracking branches' '
 (
 	cd test &&
@@ -110,6 +119,16 @@ test_expect_success C_LOCALE_OUTPUT 'remove remote' '
 	sed -e "/^refs\/remotes\/origin\//d" >actual &&
 	>expect &&
 	test_cmp expect actual
+)
+'
+
+test_expect_success 'remove default remote' '
+(
+	git clone one no-default
+	cd no-default &&
+	test "$(git config --get remote.default)" = origin   # Sanity check
+	git remote rm origin &&
+	test_must_fail git config --get remote.default
 )
 '
 
@@ -668,6 +687,28 @@ test_expect_success 'rename a remote with name prefix of other remote' '
 
 '
 
+test_expect_success 'rename the default remote' '
+	git clone one default-rename &&
+	(cd default-rename &&
+		test "$(git config --get remote.default)" = origin   # Sanity?
+		git remote rename origin tyrion
+		test "$(git config --get remote.default)" = tyrion
+	)
+
+'
+
+# This test ensures that repos created wth an older version of git and that
+# have a remote named "origin" get remote.default updated properly.
+test_expect_success 'rename the "origin" remote if remote.default is not set' '
+	git clone one default-oldschool &&
+	(cd default-oldschool &&
+		git config --unset remote.default
+		git remote rename origin stark
+		test "$(git config --get remote.default)" = stark
+	)
+'
+
+
 cat > remotes_origin << EOF
 URL: $(pwd)/one
 Push: refs/heads/master:refs/heads/upstream
@@ -1001,6 +1042,41 @@ test_expect_success 'remote set-url --delete baz' '
 	echo "YYY" >>actual &&
 	git config --get-all remote.someremote.url >>actual &&
 	cmp expect actual
+'
+
+test_expect_success 'remote default' '
+(
+	git clone -o up one default
+	cd default &&
+	test "$(git remote default)" = up
+)
+'
+
+test_expect_success 'remote default (none)' '
+(
+	test_create_repo default-none &&
+	cd default-none &&
+	test "$(git remote default)" = origin
+)
+'
+
+test_expect_success 'remote default set' '
+(
+	test_create_repo default-set &&
+	cd default-set &&
+	git remote add A /foo-A &&
+	git remote add B /foo-A &&
+	git remote default B &&
+	test "$(git remote default)" = B
+)
+'
+
+test_expect_success 'remote default bad' '
+(
+	git clone one default-bad &&
+	cd default-bad &&
+	test_must_fail git remote default NonExistant
+)
 '
 
 test_done

@@ -69,6 +69,23 @@ test_expect_success "fetch test" '
 	test "z$mine" = "z$his"
 '
 
+test_expect_success "fetch test detached HEAD uses default remote" '
+	cd "$D" &&
+	git clone -o foo . default-remote &&
+	git checkout -b detached &&
+	test_commit update1 &&
+	(
+		cd default-remote &&
+		git checkout HEAD@{0} &&
+		git fetch &&
+		test -f .git/refs/remotes/foo/detached &&
+		mine=`git rev-parse refs/remotes/foo/detached` &&
+		his=`cd .. && git rev-parse refs/heads/detached` &&
+		test "z$mine" = "z$his"
+	) &&
+	git checkout master
+'
+
 test_expect_success "fetch test for-merge" '
 	cd "$D" &&
 	cd three &&

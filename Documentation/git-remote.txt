@@ -11,6 +11,7 @@ SYNOPSIS
 [verse]
 'git remote' [-v | --verbose]
 'git remote add' [-t <branch>] [-m <master>] [-f] [--tags|--no-tags] [--mirror=<fetch|push>] <name> <url>
+'git remote default' [<name>]
 'git remote rename' <old> <new>
 'git remote remove' <name>
 'git remote set-head' <name> (-a | -d | <branch>)
@@ -75,21 +76,44 @@ because a fetch would overwrite any local commits.
 +
 When a push mirror is created with `--mirror=push`, then `git push`
 will always behave as if `--mirror` was passed.
++
+When the first remote is added to a repository, it becomes the repository's
+default remote.
+
+'default'::
+
+Displays or sets the name of the repository's default remote.  When git needs
+to automatically choose a remote to use, it first tries to use the remote
+associated with the currently checked-out branch.  If the currently
+checked-out branch has no remote, git uses the repository's default remote.
+If the repository has no default remote, git tries to use a remote named
+"origin" even if there is no actual remote named "origin".  (In other words,
+the default value for the default remote name is "origin".)
++
+With no <name> parameter, displays the current default remote name.
++
+With the <name> parameter, sets the repository's default remote to <name>.
 
 'rename'::
 
-Rename the remote named <old> to <new>. All remote-tracking branches and
+Renames the remote named <old> to <new>. All remote-tracking branches and
 configuration settings for the remote are updated.
 +
 In case <old> and <new> are the same, and <old> is a file under
 `$GIT_DIR/remotes` or `$GIT_DIR/branches`, the remote is converted to
 the configuration file format.
++
+If <old> was the repository's default remote name, the default remote name
+changes to <new>.
 
 'remove'::
 'rm'::
 
-Remove the remote named <name>. All remote-tracking branches and
-configuration settings for the remote are removed.
+Removes the remote named <name>. All remote-tracking branches and
+configuration settings for the remote are removed.  If the remote was
+the repository's default remote, then the repository's default remote
+name is changed to "origin".  Use 'git remote default <name>' to set
+the repository's default remote name.
 
 'set-head'::
 
@@ -161,7 +185,7 @@ actually prune them.
 
 'update'::
 
-Fetch updates for a named set of remotes in the repository as defined by
+Fetches updates for a named set of remotes in the repository as defined by
 remotes.<group>.  If a named group is not specified on the command line,
 the configuration parameter remotes.default will be used; if
 remotes.default is not defined, all remotes which do not have the

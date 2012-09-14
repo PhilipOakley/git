@@ -33,7 +33,11 @@ but usually it is the name of a branch in the remote repository.
 
 Default values for <repository> and <branch> are read from the
 "remote" and "merge" configuration for the current branch
-as set by linkgit:git-branch[1] `--track`.
+as set by linkgit:git-branch[1] `--track`.  If the current branch
+has no remote configured, the default for <repository> is read
+from the "remote.default" configuration variable.  If that variable
+is not set, the default <repository> is "origin" even if there is no
+actual remote named "origin".
 
 Assume the following history exists and the current branch is
 "`master`":

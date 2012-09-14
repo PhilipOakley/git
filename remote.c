@@ -48,7 +48,8 @@ static int branches_nr;
 
 static struct branch *current_branch;
 static const char *default_remote_name;
-static int explicit_default_remote_name;
+static const char *effective_remote_name;
+static int explicit_effective_remote_name;
 
 static struct rewrites rewrites;
 static struct rewrites rewrites_push;
@@ -360,8 +361,8 @@ static int handle_config(const char *key, const char *value, void *cb)
 				return config_error_nonbool(key);
 			branch->remote_name = xstrdup(value);
 			if (branch == current_branch) {
-				default_remote_name = branch->remote_name;
-				explicit_default_remote_name = 1;
+				effective_remote_name = branch->remote_name;
+				explicit_effective_remote_name = 1;
 			}
 		} else if (!strcmp(subkey, ".merge")) {
 			if (!value)
@@ -397,8 +398,12 @@ static int handle_config(const char *key, const char *value, void *cb)
 		return 0;
 	}
 	subkey = strrchr(name, '.');
-	if (!subkey)
+	if (!subkey) {
+		/* Look for remote.default */
+		if (!strcmp(name, "default"))
+			default_remote_name = xstrdup(value);
 		return 0;
+	}
 	remote = make_remote(name, subkey - name);
 	remote->origin = REMOTE_CONFIG;
 	if (!strcmp(subkey, ".mirror"))
@@ -483,7 +488,6 @@ static void read_config(void)
 	int flag;
 	if (default_remote_name) /* did this already */
 		return;
-	default_remote_name = xstrdup("origin");
 	current_branch = NULL;
 	head_ref = resolve_ref_unsafe("HEAD", sha1, 0, &flag);
 	if (head_ref && (flag & REF_ISSYMREF) &&
@@ -492,6 +496,10 @@ static void read_config(void)
 			make_branch(head_ref + strlen("refs/heads/"), 0);
 	}
 	git_config(handle_config, NULL);
+	if (!default_remote_name)
+		default_remote_name = "origin";
+	if (!effective_remote_name)
+		effective_remote_name = default_remote_name;
 	alias_all_urls();
 }
 
@@ -671,6 +679,18 @@ static int valid_remote_nick(const char *name)
 	return !strchr(name, '/'); /* no slash */
 }
 
+const char *remote_get_default_name(void)
+{
+	read_config();
+	return default_remote_name;
+}
+
+int remote_count(void)
+{
+	read_config();
+	return remotes_nr;
+}
+
 struct remote *remote_get(const char *name)
 {
 	struct remote *ret;
@@ -680,8 +700,8 @@ struct remote *remote_get(const char *name)
 	if (name)
 		name_given = 1;
 	else {
-		name = default_remote_name;
-		name_given = explicit_default_remote_name;
+		name = effective_remote_name;
+		name_given = explicit_effective_remote_name;
 	}
 
 	ret = make_remote(name, 0);

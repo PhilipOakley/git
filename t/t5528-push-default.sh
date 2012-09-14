@@ -71,10 +71,10 @@ test_expect_success '"upstream" does not push when remotes do not match' '
 	test_must_fail git push parent2
 '
 
-test_expect_success 'push from/to new branch with upstream, matching and simple' '
+test_expect_success 'push from/to new remoteless branch with upstream, matching and simple' '
 	git checkout -b new-branch &&
 	test_push_failure simple &&
-	test_push_failure matching &&
+	test_push_success matching master &&
 	test_push_failure upstream
 '
 

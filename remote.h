@@ -52,6 +52,8 @@ struct remote {
 
 struct remote *remote_get(const char *name);
 int remote_is_configured(const char *name);
+const char *remote_get_default_name(void);
+int remote_count(void);
 
 typedef int each_remote_fn(struct remote *remote, void *priv);
 int for_each_remote(each_remote_fn fn, void *priv);
