@@ -13,7 +13,8 @@ const char git_usage_string[] =
 	"           <command> [<args>]";
 
 const char git_more_info_string[] =
-	N_("See 'git help <command>' for more information on a specific command.");
+	N_("See 'git help <command>' for more information on a specific command.\n"
+	   "Or 'git help <guide>', such as 'tutorial' for an introduction to Git.");
 
 static struct startup_info git_startup_info;
 static int use_pager = -1;
