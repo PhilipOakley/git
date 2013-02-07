@@ -286,7 +286,9 @@ static int git_help_config(const char *var, const char *value, void *cb)
 	return git_default_config(var, value, cb);
 }
 
+/* Use the cmdnames struct for both commands and guides */
 static struct cmdnames main_cmds, other_cmds;
+static struct cmdnames main_guides, other_guides;
 
 static int is_git_command(const char *s)
 {
@@ -294,6 +296,11 @@ static int is_git_command(const char *s)
 		is_in_cmdlist(&other_cmds, s);
 }
 
+static int is_git_guide(const char *s)
+{
+	return is_in_cmdlist(&main_guides, s) ||
+		is_in_cmdlist(&other_guides, s);
+}
 static const char *prepend(const char *prefix, const char *cmd)
 {
 	size_t pre_len = strlen(prefix);
@@ -426,6 +433,7 @@ int cmd_help(int argc, const char **argv, const char *prefix)
 			builtin_help_usage, 0);
 	parsed_help_format = help_format;
 
+	/* TODO : add logic for list_guides() etc.*/
 	if (show_all) {
 		git_config(git_help_config, NULL);
 		printf(_("usage: %s%s"), _(git_usage_string), "\n\n");
