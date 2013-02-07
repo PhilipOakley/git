@@ -1,0 +1,23 @@
+# List of known git guides.
+# guide name				category [deprecated] [common] [guide]
+gitattributes                           mainporcelain guide
+gitcore-tutorial                        plumbingmanipulators
+gitcredentials                          purehelpers
+gitcvs-migration                        foreignscminterface
+gitdiffcore                             plumbingmanipulators
+gitglossary                             mainporcelain guide
+githooks                                purehelpers
+gitignore                               mainporcelain guide
+gitmodules                              mainporcelain guide
+gitnamespaces                           purehelpers
+gitrepository-layout                    scminterface guide
+gitrevisions                            mainporcelain guide
+gittutorial                             mainporcelain guide
+gittutorial-2                           mainporcelain
+gitweb.conf                             purehelpers
+gitweb                                  purehelpers
+gitworkflows                            mainporcelain guide
+
+# could embed inside common-cmds.h with [guide] as the second thing,
+# making the sed's in generate-cmdlist.sh more obvious
+# but drop the dash in 's/^git-\
