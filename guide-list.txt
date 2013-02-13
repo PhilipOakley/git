@@ -1,23 +1,25 @@
 # List of known git guides.
-# guide name				category [deprecated] [common]
-gitattributes                           mainporcelain common
-gitcore-tutorial                        plumbingmanipulators
-gitcredentials                          purehelpers
-gitcvs-migration                        foreignscminterface
-gitdiffcore                             plumbingmanipulators
-gitglossary                             mainporcelain common
-githooks                                purehelpers
-gitignore                               mainporcelain common
-gitk                                    mainporcelain common
-gitmodules                              mainporcelain common
-gitnamespaces                           purehelpers
-gitrepository-layout                    scminterface common
-gitrevisions                            mainporcelain common
-gittutorial                             mainporcelain common
-gittutorial-2                           mainporcelain
-gitweb.conf                             purehelpers
-gitweb                                  purehelpers
-gitworkflows                            mainporcelain common
+# guide name				category [deprecated] [common] [guide]
+gitattributes                           concept	 guide
+gitcore-tutorial                        developer
+gitcredentials                          specialist
+gitcvs-migration                        specialist
+gitdiffcore                             specialist
+gitglossary                             reference	 guide
+githooks                                specialist
+gitignore                               concept	 guide
+gitmodules                              concept	 guide
+gitnamespaces                           specialist
+gitrepository-layout                    reference guide
+gitrevisions                            concept	 guide
+gittutorial                             user	 guide
+gittutorial-2                           user
+gitweb.conf                             specialist
+gitweb                                  specialist
+gitworkflows                            user	 guide
+
+#everday                                user	 guide
+#user-manual                            user	 guide
 
 # could embed inside common-cmds.h with [guide] as the second thing,
 # making the sed's in generate-cmdlist.sh more obvious
