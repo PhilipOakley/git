@@ -140,24 +140,3 @@ git-verify-tag                          ancillaryinterrogators
 gitweb                                  ancillaryinterrogators
 git-whatchanged                         ancillaryinterrogators
 git-write-tree                          plumbingmanipulators
-
-# List of known git guides.
-# guide name				category [deprecated] [common] [guide]
-gitattributes                           mainporcelain guide
-gitcore-tutorial                        plumbingmanipulators
-gitcredentials                          purehelpers
-gitcvs-migration                        foreignscminterface
-gitdiffcore                             plumbingmanipulators
-gitglossary                             mainporcelain guide
-githooks                                purehelpers
-gitignore                               mainporcelain guide
-gitmodules                              mainporcelain guide
-gitnamespaces                           purehelpers
-gitrepository-layout                    scminterface guide
-gitrevisions                            mainporcelain guide
-gittutorial                             mainporcelain guide
-gittutorial-2                           mainporcelain
-gitweb.conf                             purehelpers
-gitweb                                  purehelpers
-gitworkflows                            mainporcelain guide
-gituser-manual                          mainporcelain guide

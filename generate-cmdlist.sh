@@ -20,20 +20,4 @@ do
 	    p
      }' "Documentation/git-$cmd.txt"
 done
-echo "};
-
-static struct cmdname_help common_guides[] = {"
-
-sed -n -e 's/^git\([^ 	]*\)[ 	].* guide.*/\1/p' command-list.txt |
-sort |
-while read cmd
-do
-     sed -n '
-     /^NAME/,/git'"$cmd"'/H
-     ${
-	    x
-	    s/.*git'"$cmd"' - \(.*\)/  {"'"$cmd"'", N_("\1")},/
-	    p
-     }' "Documentation/git$cmd.txt"
-done
-echo "};
+echo "};"
