@@ -10,7 +10,7 @@ githooks                                specialist
 gitignore                               concept	 guide
 gitmodules                              concept	 guide
 gitnamespaces                           specialist
-gitrepository-layout                    reference guide
+#gitrepository-layout                    reference guide
 gitrevisions                            concept	 guide
 gittutorial                             user	 guide
 gittutorial-2                           user
@@ -24,3 +24,5 @@ gitworkflows                            user	 guide
 # could embed inside common-cmds.h with [guide] as the second thing,
 # making the sed's in generate-cmdlist.sh more obvious
 # but drop the dash in 's/^git-\
+
+#gitrepository-layout is too long for char[16]
