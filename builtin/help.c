@@ -286,9 +286,7 @@ static int git_help_config(const char *var, const char *value, void *cb)
 	return git_default_config(var, value, cb);
 }
 
-/* Use the cmdnames struct for both commands and guides */
 static struct cmdnames main_cmds, other_cmds;
-static struct cmdnames main_guides, other_guides;
 
 static int is_git_command(const char *s)
 {
@@ -296,11 +294,6 @@ static int is_git_command(const char *s)
 		is_in_cmdlist(&other_cmds, s);
 }
 
-static int is_git_guide(const char *s)
-{
-	return is_in_cmdlist(&main_guides, s) ||
-		is_in_cmdlist(&other_guides, s);
-}
 static const char *prepend(const char *prefix, const char *cmd)
 {
 	size_t pre_len = strlen(prefix);
