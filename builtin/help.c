@@ -36,10 +36,11 @@ enum help_format {
 static const char *html_path;
 
 static int show_all = 0;
+static int show_guides = 0;
 static unsigned int colopts;
 static enum help_format help_format = HELP_FORMAT_NONE;
 static struct option builtin_help_options[] = {
-	OPTION_COUNTUP('g', "guides", &show_all, N_("print all available guides")),
+	OPTION_COUNTUP('g', "guides", &show_guides, N_("print all available guides")),
 	OPTION_COUNTUP('a', "all", &show_all, N_("print all available commands")),
 	OPT_SET_INT('m', "man", &help_format, N_("show man page"), HELP_FORMAT_MAN),
 	OPT_SET_INT('w', "web", &help_format, N_("show manual in web browser"),
@@ -438,9 +439,12 @@ int cmd_help(int argc, const char **argv, const char *prefix)
 		printf(_("usage: %s%s"), _(git_usage_string), "\n\n");
 		list_commands(colopts, &main_cmds, &other_cmds);
 		printf("%s\n", _(git_more_info_string));
+		if (!show_guides) return 0;
+	}
+	if (show_guides) {
+		list_common_guides_help();
 		return 0;
 	}
-
 	if (!argv[0]) {
 		printf(_("usage: %s%s"), _(git_usage_string), "\n\n");
 		list_common_cmds_help();
