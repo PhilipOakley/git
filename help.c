@@ -4,6 +4,7 @@
 #include "levenshtein.h"
 #include "help.h"
 #include "common-cmds.h"
+#include "common-guides.h"
 #include "string-list.h"
 #include "column.h"
 #include "version.h"
@@ -237,6 +238,23 @@ void list_common_cmds_help(void)
 		printf("   %s   ", common_cmds[i].name);
 		mput_char(' ', longest - strlen(common_cmds[i].name));
 		puts(_(common_cmds[i].help));
+	}
+}
+
+void list_common_guides_help(void)
+{
+	int i, longest = 0;
+
+	for (i = 0; i < ARRAY_SIZE(common_guides); i++) {
+		if (longest < strlen(common_guides[i].name))
+			longest = strlen(common_guides[i].name);
+	}
+
+	puts(_("The common Git guides are:"));
+	for (i = 0; i < ARRAY_SIZE(common_guides); i++) {
+		printf("   %s   ", common_guides[i].name);
+		mput_char(' ', longest - strlen(common_guides[i].name));
+		puts(_(common_guides[i].help));
 	}
 }
 
