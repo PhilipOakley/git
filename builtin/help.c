@@ -40,7 +40,7 @@ static int show_guides = 0;
 static unsigned int colopts;
 static enum help_format help_format = HELP_FORMAT_NONE;
 static struct option builtin_help_options[] = {
-	OPTION_COUNTUP('g', "guides", &show_guides, N_("print all available guides")),
+	OPTION_BOOLEAN('g', "guides", &show_guides, N_("print all available guides")),
 	OPTION_COUNTUP('a', "all", &show_all, N_("print all available commands")),
 	OPT_SET_INT('m', "man", &help_format, N_("show man page"), HELP_FORMAT_MAN),
 	OPT_SET_INT('w', "web", &help_format, N_("show manual in web browser"),
