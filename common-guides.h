@@ -6,7 +6,6 @@ static struct cmdname_help common_guides[] = {
   {"glossary", "A GIT Glossary"},
   {"ignore", "Specifies intentionally untracked files to ignore"},
   {"modules", "defining submodule properties"},
-  {"repository-layout", "Git Repository Layout"},
   {"revisions", "specifying revisions and ranges for git"},
   {"tutorial", "A tutorial introduction to git (for version 1.5.1 or newer)"},
   {"workflows", "An overview of recommended workflows with git"},
