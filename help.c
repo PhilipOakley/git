@@ -4,6 +4,7 @@
 #include "levenshtein.h"
 #include "help.h"
 #include "common-cmds.h"
+#include "common-guides.h"
 #include "string-list.h"
 #include "column.h"
 #include "version.h"
@@ -209,14 +210,14 @@ void list_commands(unsigned int colopts,
 {
 	if (main_cmds->cnt) {
 		const char *exec_path = git_exec_path();
-		printf_ln(_("available git commands in '%s'"), exec_path);
+		printf_ln(_("available Git commands in '%s'"), exec_path);
 		putchar('\n');
 		pretty_print_string_list(main_cmds, colopts);
 		putchar('\n');
 	}
 
 	if (other_cmds->cnt) {
-		printf_ln(_("git commands available from elsewhere on your $PATH"));
+		printf_ln(_("Git commands available from elsewhere on your $PATH"));
 		putchar('\n');
 		pretty_print_string_list(other_cmds, colopts);
 		putchar('\n');
@@ -232,11 +233,28 @@ void list_common_cmds_help(void)
 			longest = strlen(common_cmds[i].name);
 	}
 
-	puts(_("The most commonly used git commands are:"));
+	puts(_("The most commonly used Git commands are:"));
 	for (i = 0; i < ARRAY_SIZE(common_cmds); i++) {
 		printf("   %s   ", common_cmds[i].name);
 		mput_char(' ', longest - strlen(common_cmds[i].name));
 		puts(_(common_cmds[i].help));
+	}
+}
+
+void list_common_guides_help(void)
+{
+	int i, longest = 0;
+
+	for (i = 0; i < ARRAY_SIZE(common_guides); i++) {
+		if (longest < strlen(common_guides[i].name))
+			longest = strlen(common_guides[i].name);
+	}
+
+	puts(_("The common Git guides are:"));
+	for (i = 0; i < ARRAY_SIZE(common_guides); i++) {
+		printf("   %s   ", common_guides[i].name);
+		mput_char(' ', longest - strlen(common_guides[i].name));
+		puts(_(common_guides[i].help));
 	}
 }
 
@@ -289,7 +307,7 @@ static void add_cmd_list(struct cmdnames *cmds, struct cmdnames *old)
 #define SIMILAR_ENOUGH(x) ((x) < SIMILARITY_FLOOR)
 
 static const char bad_interpreter_advice[] =
-	N_("'%s' appears to be a git command, but we were not\n"
+	N_("'%s' appears to be a Git command, but we were not\n"
 	"able to execute it. Maybe git-%s is broken?");
 
 const char *help_unknown_cmd(const char *cmd)
@@ -380,7 +398,7 @@ const char *help_unknown_cmd(const char *cmd)
 		return assumed;
 	}
 
-	fprintf_ln(stderr, _("git: '%s' is not a git command. See 'git --help'."), cmd);
+	fprintf_ln(stderr, _("git: '%s' is not a Git command. See 'git --help'."), cmd);
 
 	if (SIMILAR_ENOUGH(best_similarity)) {
 		fprintf_ln(stderr,
