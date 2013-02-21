@@ -22,8 +22,8 @@ unusually rich command set that provides both high-level operations
 and full access to internals.
 
 See linkgit:gittutorial[7] to get started, then see
-link:everyday.html[Everyday Git] for a useful minimum set of
-commands.  The link:user-manual.html[Git User's Manual] has a more
+linkgit:giteveryday[Everyday Git] for a useful minimum set of
+commands.  The linkgit:gituser-manual[Git User's Manual] has a more
 in-depth introduction.
 
 After you mastered the basic concepts, you can come back to this
@@ -826,7 +826,7 @@ Discussion[[Discussion]]
 ------------------------
 
 More detail on the following is available from the
-link:user-manual.html#git-concepts[Git concepts chapter of the
+linkgit:gituser-manual#git-concepts[git concepts chapter of the
 user-manual] and linkgit:gitcore-tutorial[7].
 
 A Git project normally consists of a working directory with a ".git"
@@ -882,7 +882,7 @@ See the references in the "description" section to get started
 using Git.  The following is probably more detail than necessary
 for a first-time user.
 
-The link:user-manual.html#git-concepts[Git concepts chapter of the
+The linkgit:gituser-manual#git-concepts[git concepts chapter of the
 user-manual] and linkgit:gitcore-tutorial[7] both provide
 introductions to the underlying Git architecture.
 
@@ -919,9 +919,9 @@ subscribed to the list to send a message there.
 SEE ALSO
 --------
 linkgit:gittutorial[7], linkgit:gittutorial-2[7],
-link:everyday.html[Everyday Git], linkgit:gitcvs-migration[7],
+linkgit:giteveryday[Everyday Git], linkgit:gitcvs-migration[7],
 linkgit:gitglossary[7], linkgit:gitcore-tutorial[7],
-linkgit:gitcli[7], link:user-manual.html[The Git User's Manual],
+linkgit:gitcli[7], linkgit:gituser-manual[The Git User's Manual],
 linkgit:gitworkflows[7]
 
 GIT
