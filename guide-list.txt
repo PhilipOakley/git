@@ -1,0 +1,29 @@
+# List of known git guides.
+# guide name				category [deprecated] [common] [guide]
+gitattributes                           concept	 guide
+gitcore-tutorial                        specialist
+gitcredentials                          specialist
+gitcvs-migration                        specialist
+gitdiffcore                             specialist
+gitglossary                             reference	 guide
+githooks                                specialist
+gitignore                               concept	 guide
+gitmodules                              concept	 guide
+gitnamespaces                           specialist
+#gitrepository-layout                    reference guide
+gitrevisions                            concept	 guide
+gittutorial                             user	 guide
+gittutorial-2                           user
+gitweb.conf                             specialist
+gitweb                                  specialist
+gitworkflows                            user	 guide
+
+#giteveryday                             user	 guide
+#gituser-manual                          user	 guide
+
+# could embed inside common-cmds.h with [guide] as the second thing,
+# making the sed's in generate-cmdlist.sh more obvious
+# but drop the dash in 's/^git-\
+
+#gitrepository-layout is too long for the current char[16]
+#
