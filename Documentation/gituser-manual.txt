@@ -1,7 +1,12 @@
 Git User's Manual (for version 1.5.3 or newer)
-______________________________________________
+==============================================
 
+NAME
+----
+gituser-manual - User Manual for Git, the stupid content tracker
 
+SYNOPSIS
+--------
 Git is a fast distributed revision control system.
 
 This manual is designed to be readable by someone with basic UNIX

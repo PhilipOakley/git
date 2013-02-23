@@ -1,6 +1,12 @@
-Everyday Git With 20 Commands Or So
-===================================
+Everyday-Git(7)
+===============
 
+NAME
+----
+giteveryday - A useful minimum set of commands for Everyday Git 
+
+SYNOPSIS
+--------
 <<Individual Developer (Standalone)>> commands are essential for
 anybody who makes a commit, even for somebody who works alone.
 
