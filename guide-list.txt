@@ -10,7 +10,7 @@ githooks                                specialist
 gitignore                               concept	 guide
 gitmodules                              concept	 guide
 gitnamespaces                           specialist
-#gitrepository-layout                    reference guide
+gitrepository-layout                    reference guide
 gitrevisions                            concept	 guide
 gittutorial                             user	 guide
 gittutorial-2                           user
@@ -18,12 +18,13 @@ gitweb.conf                             specialist
 gitweb                                  specialist
 gitworkflows                            user	 guide
 
-#giteveryday                             user	 guide
-#gituser-manual                          user	 guide
+giteveryday                             user	 guide
+gituser-manual                          user	 guide
 
-# could embed inside common-cmds.h with [guide] as the second thing,
-# making the sed's in generate-cmdlist.sh more obvious
-# but drop the dash in 's/^git-\
+# Could embed inside common-cmds.h and move generate-guidelist.sh
+# into generate-cmdlist.sh 
 
-#gitrepository-layout is too long for the current char[16]
-#
+# Could also extend generate-guidelist.sh to create a second, complete
+# list of guides should -gg option be applied twice (It's a countup option)
+
+# use './generate-guidelist.sh >common-guides.h' to re-generate.
