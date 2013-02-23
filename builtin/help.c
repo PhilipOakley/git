@@ -434,6 +434,7 @@ int cmd_help(int argc, const char **argv, const char *prefix)
 		if (!show_guides) return 0;
 	}
 	if (show_guides) {
+		list_common_guides_help();
 		return 0;
 	}
 	if (!argv[0]) {
