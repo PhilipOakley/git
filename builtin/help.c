@@ -433,7 +433,8 @@ int cmd_help(int argc, const char **argv, const char *prefix)
 	}
 
 	if (show_guides) {
-		/* do action - next patch */
+		list_common_guides_help();
+		printf("\n");
 	}
 
 	if (show_all || show_guides) {
