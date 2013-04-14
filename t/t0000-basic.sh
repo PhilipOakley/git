@@ -610,4 +610,12 @@ test_expect_success 'very long name in the index handled sanely' '
 	test $len = 4098
 '
 
+test_expect_success 'git version string X.Y.Z' '
+	git --version >verstring &&
+	test_line_count =  1 verstring &&
+	len=$(wc -c verstring | sed "s/[^0-9]//g") &&
+	test $len -lt  80 &&
+	egrep -q "^git version [0-9]+\.[0-9]+\.[0-9]+.*" verstring
+'
+
 test_done
