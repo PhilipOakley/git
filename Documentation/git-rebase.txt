@@ -16,6 +16,10 @@ SYNOPSIS
 
 DESCRIPTION
 -----------
+'git rebase' will transfer local commits, excluding merge commits
+by default, to the head of the branch's upstream, or onto a new base
+if given.
+
 If <branch> is specified, 'git rebase' will perform an automatic
 `git checkout <branch>` before doing anything else.  Otherwise
 it remains on the current branch.
