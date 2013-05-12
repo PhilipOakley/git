@@ -1,0 +1,1 @@
+Git version string X.Y.Z
