@@ -20,6 +20,12 @@ DESCRIPTION
 by default, to the head of the branch's upstream, or onto a new base
 if given.
 
+In its minimal form, having built locally on the (current) branch,
+use `git rebase` to catch up with its published upstream state to
+create a new linear history. Importantly, `git rebase` is a way to
+replay your work on top of the work of others. It is not about
+integrating other people's changes into your work.
+
 If <branch> is specified, 'git rebase' will perform an automatic
 `git checkout <branch>` before doing anything else.  Otherwise
 it remains on the current branch.
