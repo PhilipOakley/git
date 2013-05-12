@@ -365,9 +365,9 @@ OPTIONS
 -------
 --version::
 	Prints the Git suite version that the 'git' program came from.
-	The version string is a single line that matches the extended
+	The version string is a single line that matches the
 	regular expression
-	'^git version [0-9]+\.[0-9]+\.[0-9]+.*'
+	'^git version [0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*.*'
 	and is less than 80 characters.
 
 --help::
