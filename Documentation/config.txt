@@ -718,6 +718,8 @@ branch.<name>.remote::
 	overridden by `branch.<name>.pushremote`.  If no remote is
 	configured, or if you are not on any branch, it defaults to
 	`origin` for fetching and `remote.pushdefault` for pushing.
+	Additionally, a `.` (period) means the current local repository
+	(a dot-repository), see `branch.<name>.merge`'s final note below.
 
 branch.<name>.pushremote::
 	When on branch <name>, it overrides `branch.<name>.remote` for
