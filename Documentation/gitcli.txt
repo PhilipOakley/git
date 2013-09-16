@@ -63,6 +63,10 @@ Just as the filesystem '.' (period) refers to the current directory,
 using a '.' as a repository name in Git (a dot-repository) is a relative
 path for your current repository.
 
+ * Just as the filesystem '.' (period) refers to the current directory,
+   using a '.' as a repository name in Git (a dot-repository) is a relative
+   path and hence your current repository.
+
 Here are the rules regarding the "flags" that you should follow when you are
 scripting Git:
 
