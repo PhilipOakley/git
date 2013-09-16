@@ -55,6 +55,14 @@ These two syntaxes are mostly equivalent, except the former implies
 --local option.
 endif::git-clone[]
 
+Relative paths are relative to the current directory. Hence while the
+path:
+
+- '.'
+
+is the current directory, it is also the current repository and acts
+as if it were a repository named `'.'`.
+
 When Git doesn't know how to handle a certain transport protocol, it
 attempts to use the 'remote-<transport>' remote helper, if one
 exists. To explicitly request a remote helper, the following syntax
