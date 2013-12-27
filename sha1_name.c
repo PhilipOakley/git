@@ -1354,6 +1354,20 @@ static int get_sha1_with_context_1(const char *name,
 		    name[2] != ':' ||
 		    name[1] < '0' || '3' < name[1])
 			cp = name + 1;
+			if (name[1] == '(' && namelen > 8) {
+				if (!strncmp(name[2], 'base):', 6) {
+					cp = name + 8;
+					stage = 1;
+					}
+				if (!strncmp(name[2], 'ours):', 6) {
+					cp = name + 8;
+					stage = 2;
+					}
+				if ((namelen > 10) && (!strncmp(name[2], 'theirs):', 8)) {
+					cp = name + 10;
+					stage = 3;
+					}
+			}
 		else {
 			stage = name[1] - '0';
 			cp = name + 3;

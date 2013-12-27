@@ -176,6 +176,11 @@ existing tag object.
   (typically the current branch), and stage 3 is the version from
   the branch which is being merged.
 
+':(<stage>):<path>', i.e. ':(base):README', ':(ours):README',':(theirs):README',::
+  Name the merge stage using a magic pathspec style format. The exact
+  stage name string must be used. Use the numeric format if a pathname
+  clash may ensue.
+
 Here is an illustration, by Jon Loeliger.  Both commit nodes B
 and C are parents of commit node A.  Parent commits are ordered
 left-to-right.
