@@ -1,0 +1,11 @@
+Make 'git help everyday' work  (coverletter)
+
+The "Everyday GIT With 20 Commands Or So" is not accessible via the git help system. fix that.
+
+The git everyday file does not use the appropriate filenaming convention for help files, and is not suitably formatted for display as a man page.
+
+First copy everyday.txt to giteveryday.txt
+Second modify giteveryday to fit man page formatting. Include the standard Git footer.
+Third add giteveryday to the manpages make list.
+Fourth add deprecation note to older everday.txt. Include link to new man page.
+Fifth add 'everyday' to the help --guides list.
