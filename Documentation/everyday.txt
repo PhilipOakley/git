@@ -1,6 +1,10 @@
 Everyday Git With 20 Commands Or So
 ===================================
 
+Note, the Everyday Git guidance is now available via `git help everyday`
+linkgit:giteveryday[7].
+This version is deprecated and may be removed in later releases.
+
 <<Individual Developer (Standalone)>> commands are essential for
 anybody who makes a commit, even for somebody who works alone.
 
