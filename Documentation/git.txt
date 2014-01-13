@@ -1015,6 +1015,7 @@ link:technical/api-index.html[Git API documentation].
 Users migrating from CVS may also want to
 read linkgit:gitcvs-migration[7].
 
+Full release notes: see linkgit:gitrelease-notes[7].
 
 Authors
 -------
