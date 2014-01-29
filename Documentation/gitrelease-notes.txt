@@ -14,15 +14,19 @@ SYNOPSIS
 DESCRIPTION
 -----------
 
-Provide the full set of release notes, in reverse chronological order, of Git.
-
-You are reading the documentation for the latest (possibly
+Provide the release notes for the latest (possibly
 unreleased) version of Git, that is available from 'master'
 branch of the `git.git` repository.
 
-// include::../RelNotes[]
+RELEASE NOTES
+-------------
 
-Documentation for older releases are available here:
+----------------------
+sys2::[cat ../RelNotes]
+-----------------------
+
+OLDER RELEASE NOTES
+-------------------
 
 include::stalenotes.txt[]
 
