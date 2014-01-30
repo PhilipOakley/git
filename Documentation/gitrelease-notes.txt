@@ -21,14 +21,18 @@ branch of the `git.git` repository.
 RELEASE NOTES
 -------------
 
-----------------------
+----
 sys2::[cat ../RelNotes]
------------------------
+----
 
 OLDER RELEASE NOTES
 -------------------
 
+[NOTE]
+============
+
 include::stalenotes.txt[]
+============
 
 GIT
 ---
