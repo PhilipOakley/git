@@ -1,0 +1,37 @@
+gitrelease-notes(7)
+===================
+
+NAME
+----
+gitrelease-notes - the onward progress of the stupid content tracker
+
+
+SYNOPSIS
+--------
+[verse]
+'git help release-notes'
+
+DESCRIPTION
+-----------
+
+Provide the release notes for the latest (possibly
+unreleased) version of Git, that is available from 'master'
+branch of the `git.git` repository.
+
+RELEASE NOTES
+-------------
+
+----
+include::../RelNotes[]
+----
+
+OLDER RELEASE NOTES
+-------------------
+
+Release notes for older versions are available in the Git source
+Documentation/RelNotes/ folder. This is currently available at
+https://code.google.com/p/git-core/source/browse/
+
+GIT
+---
+Part of the linkgit:git[1] suite
