@@ -7,13 +7,22 @@ giteveryday - A useful minimum set of commands for Everyday Git
 
 SYNOPSIS
 --------
-
-Everyday Git With 20 Commands Or So
+[verse]
+'git help everyday' - Everyday Git With 20 Commands Or So
 
 DESCRIPTION
 -----------
+The most useful Git commands will depend on your role and workstyle.
+Modern Git, through its flexibility, offers a wide range of workstyles
+which have been summarised here into five categories for ease of description.
+
 <<STANDALONE,Individual Developer (Standalone)>> commands are essential for
-anybody who makes a commit, even for somebody who works alone.
+anybody who makes a commit. This includes those who works completely alone,
+using just a local repository.
+
+<<HOSTEDREMOTE,Individual Developer (Hosted Remote)>> commands are for those
+who maintain a remote copy of their repository, often on a hosted remote
+server, so need commands to interact with remote repositories.
 
 If you work with other people, you will need commands listed in
 the <<PARTICIPANT,Individual Developer (Participant)>> section as well.
@@ -72,7 +81,7 @@ $ git commit -m "import of frotz source tree."
 $ git tag v2.43 <2>
 ------------
 +
-<1> add everything under the current directory.
+<1> add everything under the current directory "'.'".
 <2> make a lightweight, unannotated tag.
 
 Create a topic branch and develop.::
@@ -98,7 +107,7 @@ $ git log v2.43.. curses/ <12>
 +
 <1> create a new topic branch.
 <2> revert your botched changes in `curses/ux_audio_oss.c`.
-<3> you need to tell Git if you added a new file; removal and
+<3> you need to tell Git if you added a new file; only removal and
 modification will be caught if you do `git commit -a` later.
 <4> to see what changes you are committing.
 <5> commit everything as you have tested, with your sign-off.
@@ -114,6 +123,41 @@ combined and include `--max-count=10` (show 10 commits),
 <12> view only the changes that touch what's in `curses/`
 directory, since `v2.43` tag.
 
+Individual Developer (Hosted Remote)[[HOSTEDREMOTE]]
+----------------------------------------------------
+
+Remote hosted repositories are now commonly available. These allow
+the developer to maintain a copy on the remote hots.
+
+  * linkgit:git-remote[1] to prime your local
+    repository.
+	
+  * linkgit:git-pull[1] and linkgit:git-fetch[1] from "origin"
+    to keep up-to-date with the upstream.
+
+  * linkgit:git-push[1] to shared repository, if you adopt CVS
+    style shared repository workflow.
+
+Examples
+~~~~~~~~
+
+Clone the upstream and work on it.  Feed changes to upstream.::
++
+------------
+$ git remote add hosted git://www.example.com/user/repo.git <1>
+$ git push <2>
+
+$ git pull hosted ALL <5>
+$ git reset --hard ORIG_HEAD <6>
+
+$ git fetch --tags <8>
+------------
++
+<1> see https://git.wiki.kernel.org/index.php/GitHosting or providers.
+<2> 
+
+
+
 
 Individual Developer (Participant)[[PARTICIPANT]]
 -------------------------------------------------
@@ -125,14 +169,10 @@ addition to the ones needed by a standalone developer.
   * linkgit:git-clone[1] from the upstream to prime your local
     repository.
 
-  * linkgit:git-pull[1] and linkgit:git-fetch[1] from "origin"
-    to keep up-to-date with the upstream.
-
-  * linkgit:git-push[1] to shared repository, if you adopt CVS
-    style shared repository workflow.
-
   * linkgit:git-format-patch[1] to prepare e-mail submission, if
     you adopt Linux kernel-style public forum workflow.
+
+  * linkgit:git-am[1] to apply mailbox patches.
 
 Examples
 ~~~~~~~~
@@ -213,7 +253,8 @@ $ git format-patch -k -m --stdout v2.6.14..private2.6.14 |
 <1> create a private branch based on a well known (but somewhat behind)
 tag.
 <2> forward port all changes in `private2.6.14` branch to `master` branch
-without a formal "merging".
+without a formal "merging" through the medium of mailbox patches, rather
+than a rebase.
 
 
 Integrator[[INTEGRATOR]]
