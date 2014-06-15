@@ -440,7 +440,10 @@ example the following invocations are equivalent:
 
 -c <name>=<value>::
 	Pass a configuration parameter to the command. The value
-	given will override values from configuration files.
+	given will override single valued variables from configuration
+	files, and append to multivar variables. Previous multivar values
+	remain in effect. Use "insteadOf" style config variables when an
+	over-ride is needed.
 	The <name> is expected in the same format as listed by
 	'git config' (subkeys separated by dots).
 
