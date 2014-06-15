@@ -404,6 +404,13 @@ For Python scripts:
    documentation for version 2.6 does not mention this prefix, it has
    been supported since version 2.6.0.
 
+Error Messages
+
+ - We typically do not end error messages with a full stop. While
+   we've been rather inconsistent in the past, these days we mostly
+   settle on no punctuation.
+
+
 Writing Documentation:
 
  Most (if not all) of the documentation pages are written in the
