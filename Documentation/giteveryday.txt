@@ -12,18 +12,22 @@ Everyday Git With 20 Commands Or So
 
 DESCRIPTION
 -----------
-<<STANDALONE,Individual Developer (Standalone)>> commands are essential for
-anybody who makes a commit, even for somebody who works alone.
 
-If you work with other people, you will need commands listed in
-the <<PARTICIPANT,Individual Developer (Participant)>> section as well.
+Git users can broadly be grouped into four categories for the purposes of
+describing here a small set of useful command for everyday Git.
 
-People who play the <<INTEGRATOR,Integrator>> role need to learn some more
-commands in addition to the above.
+*	<<STANDALONE,Individual Developer (Standalone)>> commands are essential
+	for anybody who makes a commit, even for somebody who works alone.
 
-<<ADMINISTRATION,Repository Administration>> commands are for system
-administrators who are responsible for the care and feeding
-of Git repositories.
+*	If you work with other people, you will need commands listed in
+	the <<PARTICIPANT,Individual Developer (Participant)>> section as well.
+
+*	People who play the <<INTEGRATOR,Integrator>> role need to learn some
+	more commands in addition to the above.
+
+*	<<ADMINISTRATION,Repository Administration>> commands are for system
+	administrators who are responsible for the care and feeding
+	of Git repositories.
 
 
 Individual Developer (Standalone)[[STANDALONE]]
@@ -34,8 +38,6 @@ other people, and works alone in a single repository, using the
 following commands.
 
   * linkgit:git-init[1] to create a new repository.
-
-  * linkgit:git-show-branch[1] to see where you are.
 
   * linkgit:git-log[1] to see what happened.
 
@@ -86,14 +88,12 @@ $ edit/compile/test
 $ git diff HEAD <4>
 $ git commit -a -s <5>
 $ edit/compile/test
-$ git reset --soft HEAD^ <6>
-$ edit/compile/test
-$ git diff ORIG_HEAD <7>
-$ git commit -a -c ORIG_HEAD <8>
-$ git checkout master <9>
-$ git merge alsa-audio <10>
-$ git log --since='3 days ago' <11>
-$ git log v2.43.. curses/ <12>
+$ git diff HEAD^ <6>
+$ git commit -a --amend <7>
+$ git checkout master <8>
+$ git merge alsa-audio <9>
+$ git log --since='3 days ago' <10>
+$ git log v2.43.. curses/ <11>
 ------------
 +
 <1> create a new topic branch.
@@ -102,16 +102,15 @@ $ git log v2.43.. curses/ <12>
 modification will be caught if you do `git commit -a` later.
 <4> to see what changes you are committing.
 <5> commit everything as you have tested, with your sign-off.
-<6> take the last commit back, keeping what is in the working tree.
-<7> look at the changes since the premature commit we took back.
-<8> redo the commit undone in the previous step, using the message
-you originally wrote.
-<9> switch to the master branch.
-<10> merge a topic branch into your master branch.
-<11> review commit logs; other forms to limit output can be
+<6> look at all your changes including the previous commit.
+<7> amend the previous commit, adding all your new changes,
+using your original message.
+<8> switch to the master branch.
+<9> merge a topic branch into your master branch.
+<10> review commit logs; other forms to limit output can be
 combined and include `--max-count=10` (show 10 commits),
 `--until=2005-12-10`, etc.
-<12> view only the changes that touch what's in `curses/`
+<11> view only the changes that touch what's in `curses/`
 directory, since `v2.43` tag.
 
 
@@ -134,6 +133,10 @@ addition to the ones needed by a standalone developer.
   * linkgit:git-format-patch[1] to prepare e-mail submission, if
     you adopt Linux kernel-style public forum workflow.
 
+  * linkgit:git-send-email[1] to send your e-mail submission without
+    corruption by your MUA.
+
+
 Examples
 ~~~~~~~~
 
@@ -142,28 +145,47 @@ Clone the upstream and work on it.  Feed changes to upstream.::
 ------------
 $ git clone git://git.kernel.org/pub/scm/.../torvalds/linux-2.6 my2.6
 $ cd my2.6
-$ edit/compile/test; git commit -a -s <1>
-$ git format-patch origin <2>
-$ git pull <3>
-$ git log -p ORIG_HEAD.. arch/i386 include/asm-i386 <4>
-$ git pull git://git.kernel.org/pub/.../jgarzik/libata-dev.git ALL <5>
-$ git reset --hard ORIG_HEAD <6>
-$ git gc <7>
-$ git fetch --tags <8>
+$ git checkout --track mine master <1>
+$ edit/compile/test; git commit -a -s <2>
+$ git format-patch master <3>
+$ git send-email --to="person <email@example.com>" 00*.patch <3b>
+$ git checkout master
+$ git pull <4>
+$ git log -p ORIG_HEAD.. arch/i386 include/asm-i386 <5>
+$ git checkout jgarzik-dev 
+$ git pull git://git.kernel.org/pub/.../jgarzik/libata-dev.git dev <6>
+$ git reset --hard ORIG_HEAD <7>
+$ git gc <8>
+$ git fetch --tags <9>
 ------------
 +
-<1> repeat as needed.
-<2> extract patches from your branch for e-mail submission.
-<3> `git pull` fetches from `origin` by default and merges into the
+<1> checkout master branch as a new branch 'mine' which tracks the
+upstream 'master'.
+<2> repeat as needed.
+<3> extract patches from your branch, relative to master,
+<3b> and email them.
+<4> `git pull` fetches from `origin` by default and merges into the
 current branch.
-<4> immediately after pulling, look at the changes done upstream
+<5> immediately after pulling, look at the changes done upstream
 since last time we checked, only in the
 area we are interested in.
-<5> fetch from a specific branch from a specific repository and merge.
-<6> revert the pull.
-<7> garbage collect leftover objects from reverted pull.
-<8> from time to time, obtain official tags from the `origin`
+<6> fetch from a specific branch 'dev' from a specific repository and merge.
+<7> revert the pull.
+<8> garbage collect leftover objects from reverted pull.
+<9> from time to time, obtain official tags from the `origin`
 and store them under `.git/refs/tags/`.
+
+
+If I were writing this today..
+made it work on 'mine' branch,
+produced a patch series out of that branch relative to @{u}, 
+threw in 'git send-email' invocation,
+ and after, "git checkout master"
+had "git pull" update the pristine 'master' branch.
+Merging of work by jgarzik (i.e. not your upstream) would also have gone to its
+own branch, not to 'master'.
+
+
 
 
 Push into another repository.::
@@ -177,7 +199,7 @@ remote.origin.fetch refs/heads/*:refs/remotes/origin/*
 branch.master.remote origin
 branch.master.merge refs/heads/master
 satellite$ git config remote.origin.push \
-           master:refs/remotes/satellite/master <3>
+           +refs/heads/*:refs/remotes/satellite/* <3>
 satellite$ edit/compile/test/commit
 satellite$ git push origin <4>
 
@@ -192,10 +214,10 @@ machine.
 <2> clone sets these configuration variables by default.
 It arranges `git pull` to fetch and store the branches of mothership
 machine to local `remotes/origin/*` remote-tracking branches.
-<3> arrange `git push` to push local `master` branch to
-`remotes/satellite/master` branch of the mothership machine.
-<4> push will stash our work away on `remotes/satellite/master`
-remote-tracking branch on the mothership machine.  You could use this
+<3> arrange `git push` to push all local branches to
+their corresponding branch of the mothership machine.
+<4> push will stash all our work away on `remotes/satellite/*`
+remote-tracking branches on the mothership machine.  You could use this
 as a back-up method.
 <5> on mothership machine, merge the work done on the satellite
 machine into the master branch.
@@ -236,23 +258,29 @@ commands in addition to the ones needed by participants.
 
   * linkgit:git-push[1] to publish the bleeding edge.
 
+# Among these enumerated items, we may want to reword this a little
+# bit to hint that this section also applies to GitHub pull-request
+# workflow.  However, I am not sure how their "merge without first
+# locally checking" action on their website fits in the picture.
 
 Examples
 ~~~~~~~~
 
-My typical Git day.::
-+
+A typical integrator's Git day.
+
 ------------
 $ git status <1>
 $ git show-branch <2>
+git log @{u}.." to see how much more you have
+done on top of others' work?
 $ mailx <3>
 & s 2 3 4 5 ./+to-apply
 & s 7 8 ./+hold-linus
 & q
 $ git checkout -b topic/one master
-$ git am -3 -i -s -u ./+to-apply <4>
+$ git am -3 -i -s ./+to-apply <4>
 $ compile/test
-$ git checkout -b hold/linus && git am -3 -i -s -u ./+hold-linus <5>
+$ git checkout -b hold/linus && git am -3 -i -s ./+hold-linus <5>
 $ git checkout topic/one && git rebase master <6>
 $ git checkout pu && git reset --hard next <7>
 $ git merge topic/one topic/two && git merge hold/linus <8>
@@ -260,9 +288,12 @@ $ git checkout maint
 $ git cherry-pick master~4 <9>
 $ compile/test
 $ git tag -s -m "GIT 0.99.9x" v0.99.9x <10>
-$ git fetch ko && git show-branch master maint 'tags/ko-*' <11>
-$ git push ko <12>
-$ git push ko v0.99.9x <13>
+$ git fetch ko
+$for branch in master maint next pu
+    do
+        git show-branch ko/$branch $branch
+    done  <11>
+$ git push --follow-tags ko <12>
 ------------
 +
 <1> see what I was in the middle of doing, if any.
@@ -299,8 +330,7 @@ In the output from `git show-branch`, `master` should have
 everything `ko-master` has, and `next` should have
 everything `ko-next` has.
 
-<12> push out the bleeding edge.
-<13> push the tag out, too.
+<12> push out the bleeding edge and push the tags out, too.
 
 
 Repository Administration[[ADMINISTRATION]]
