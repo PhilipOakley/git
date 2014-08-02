@@ -523,25 +523,25 @@ $ git format-patch -k --stdout R1..R2 | git am -3 -k
 ------------
 
 * Extract all commits which are in the current branch but not in the
-origin branch:
+master branch:
 +
 ------------
-$ git format-patch origin
+$ git format-patch master
 ------------
 +
 For each commit a separate file is created in the current directory.
 
-* Extract all commits that lead to 'origin' since the inception of the
+* Extract all commits that lead to 'master' since the inception of the
 project:
 +
 ------------
-$ git format-patch --root origin
+$ git format-patch --root master
 ------------
 
 * The same as the previous one:
 +
 ------------
-$ git format-patch -M -B origin
+$ git format-patch -M -B master
 ------------
 +
 Additionally, it detects and handles renames and complete rewrites
