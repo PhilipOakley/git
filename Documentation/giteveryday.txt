@@ -343,7 +343,7 @@ example of managing a shared central repository.
 
 In addition there are a number of other widely deployed hosting, browsing
 and reviewing solutions such as:
-+
+
   * gitolite, gerrit code review, cgit and others.
 
 Examples
@@ -390,8 +390,8 @@ Others might be different.
 
 Give push/pull only access to developers using git-over-ssh.::
 
-e.g. those using: +
-`     $ git push/pull ssh://host.xz/pub/scm/project`
+e.g. those using:
+`$ git push/pull ssh://host.xz/pub/scm/project`
 +
 ------------
 $ grep git /etc/passwd <1>
