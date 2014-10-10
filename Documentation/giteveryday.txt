@@ -108,7 +108,7 @@ using your original message.
 <8> switch to the master branch.
 <9> merge a topic branch into your master branch.
 <10> review commit logs; other forms to limit output can be
-combined and include `--max-count=10` (show 10 commits),
+combined and include '10' (equiv. `--max-count=10`, to show 10 commits),
 `--until=2005-12-10`, etc.
 <11> view only the changes that touch what's in `curses/`
 directory, since `v2.43` tag.
@@ -136,6 +136,9 @@ addition to the ones needed by a standalone developer.
   * linkgit:git-send-email[1] to send your e-mail submission without
     corruption by your MUA.
 
+  * linkgit:git-request-pull[1] to create a summary of changes
+    for your upstream to pull.
+
 
 Examples
 ~~~~~~~~
@@ -149,31 +152,30 @@ $ git checkout -b mine master <1>
 $ edit/compile/test; git commit -a -s <2>
 $ git format-patch master <3>
 $ git send-email --to="person <email@example.com>" 00*.patch <4>
-$ git pull <5>
-$ git log -p ORIG_HEAD.. arch/i386 include/asm-i386 <6>
-$ git ls-remote --heads http://git.kernel.org/.../jgarzik/libata-dev.git <7>
-$ git pull git://git.kernel.org/pub/.../jgarzik/libata-dev.git ALL <8>
-$ git reset --hard ORIG_HEAD <9>
-$ git gc <10>
-$ git fetch --tags <11>
+$ git checkout master <5>
+$ git pull <6>
+$ git log -p ORIG_HEAD.. arch/i386 include/asm-i386 <7>
+$ git ls-remote --heads http://git.kernel.org/.../jgarzik/libata-dev.git <8>
+$ git pull git://git.kernel.org/pub/.../jgarzik/libata-dev.git ALL <9>
+$ git reset --hard ORIG_HEAD <10>
+$ git gc <11>
 ------------
 +
 <1> checkout a new branch 'mine' from master.
 <2> repeat as needed.
 <3> extract patches from your branch, relative to master,
 <4> and email them.
-<5> `git pull` fetches from `origin` by default and merges into the
+<5> return to 'master', ready to see what's new
+<6> `git pull` fetches from `origin` by default and merges into the
 current branch.
-<6> immediately after pulling, look at the changes done upstream
+<7> immediately after pulling, look at the changes done upstream
 since last time we checked, only in the
 area we are interested in.
-<7> check the branch names in an external repository (if not known).
-<8> fetch from a specific branch 'ALL' from a specific repository
+<8> check the branch names in an external repository (if not known).
+<9> fetch from a specific branch 'ALL' from a specific repository
 and merge it.
-<9> revert the pull.
-<10> garbage collect leftover objects from reverted pull.
-<11> from time to time, obtain official tags from the `origin`
-and store them under `.git/refs/tags/`.
+<10> revert the pull.
+<11> garbage collect leftover objects from reverted pull.
 
 
 Push into another repository.::
@@ -206,7 +208,8 @@ machine to local `remotes/origin/*` remote-tracking branches.
 their corresponding branch of the mothership machine.
 <4> push will stash all our work away on `remotes/satellite/*`
 remote-tracking branches on the mothership machine.  You could use this
-as a back-up method.
+as a back-up method. Likewise, you can pretend that mothership
+"fetched" from you (useful when access is one sided).
 <5> on mothership machine, merge the work done on the satellite
 machine into the master branch.
 
@@ -226,6 +229,10 @@ without a formal "merging". Or longhand +
 `git format-patch -k -m --stdout v2.6.14..private2.6.14 |
   git am -3 -k`
 
+An alternate participant submission mechanism is using the
+'git request-pull' or pull-request mechanisms (e.g as used on
+GitHub (www.github.com) to notify your upstream of your
+contribution.
 
 Integrator[[INTEGRATOR]]
 ------------------------
@@ -235,8 +242,12 @@ project receives changes made by others, reviews and integrates
 them and publishes the result for others to use, using these
 commands in addition to the ones needed by participants.
 
-This section can also be applied to a git-request-pull workflow,
-or the GitHub (www.github.com) pull-request flow.
+This section can also be used by those who respond to 'git
+request-pull' or pull-request on GitHub (www.github.com) to
+integrate the work of others into their history. An sub-area
+lieutenant for a repository will act both as a participant and
+as an integrator.
+
 
   * linkgit:git-am[1] to apply patches e-mailed in from your
     contributors.
@@ -249,9 +260,6 @@ or the GitHub (www.github.com) pull-request flow.
   * linkgit:git-revert[1] to undo botched commits.
 
   * linkgit:git-push[1] to publish the bleeding edge.
-
-  * linkgit:git-request-pull[1] to create a summary of changes
-    for your upstream to pull.
 
 
 Examples
