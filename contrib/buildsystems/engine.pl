@@ -339,10 +339,8 @@ sub handleLinkLine
             push(@libs, $part);
         } elsif ($part eq 'invalidcontinue.obj') {
             # ignore - known to MSVC
-        } elsif ($part =~ /\.o$/) {
+        } elsif ($part =~ /\.(o|obj)$/) {
             push(@objfiles, $part);
-        } elsif ($part =~ /\.obj$/) {
-            # do nothing, 'make' should not be producing .obj, only .o files
         } else {
             die "Unhandled lib option @ line $lineno: $part";
         }
