@@ -47,3 +47,6 @@ This sort of suggests that the original intent was MSVC meant the compiler/IDE a
 
 10. (side note) rebase -i manual to also point to cherry pick // or, the noop message to add the information about what the noob error was ..  (confusion between rebase branch onto another branch, and rebase interactively the current branch from commit <n> - i.e. the initial mush I committed)
 
+Note that msvc-build has to be run from within the msysgit.bat window, rather than the bash window because they have different facilities. The bash window wont have the ./bin/msvc-build on it's PATH, so won't find it.!
+
+The msvc-build, on top of 1.9.5 (in my 1.9.4 directory) runs and compiles in VS08 OK (no errors)

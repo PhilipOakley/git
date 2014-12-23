@@ -289,11 +289,13 @@ sub handleLibLine
             die "Unhandled lib option @ line $lineno: $part";
         }
     }
-#    print "LibOut: '$libout'\nLFlags: @lflags\nOfiles: @objfiles\n";
+    #print "LibOut: '$libout'\nLFlags: @lflags\nOfiles: @objfiles\n";
 #    exit(1);
     foreach (@objfiles) {
         my $sourcefile = $_;
+        #print "sourcefile |'$sourcefile'|\n";
         $sourcefile =~ s/\.o$/.c/;
+        #print "sourcesubst |'$sourcefile'|\n";
         push(@sources, $sourcefile);
         push(@cflags, @{$compile_options{"${sourcefile}_CFLAGS"}});
         push(@defines, @{$compile_options{"${sourcefile}_DEFINES"}});
@@ -345,15 +347,23 @@ sub handleLinkLine
             die "Unhandled lib option @ line $lineno: $part";
         }
     }
-#    print "AppOut: '$appout'\nLFlags: @lflags\nLibs  : @libs\nOfiles: @objfiles\n";
+    #print "AppOut: '$appout'\nLFlags: @lflags\nLibs  : @libs\nOfiles: @objfiles\n";
 #    exit(1);
     foreach (@objfiles) {
         my $sourcefile = $_;
         $sourcefile =~ s/\.o$/.c/;
         push(@sources, $sourcefile);
+		#print "Source File : '$sourcefile'\n";
+		#print "Source File 2 : '${sourcefile}_CFLAGS'\n";
+		#print "Source File 2 :   \n";
+		#use Data::Dumper;
+#    print "Parsed compile_options:\n";
+#    print Dumper(%compile_options);
         push(@cflags, @{$compile_options{"${sourcefile}_CFLAGS"}});
+#       print "Source File 1st push!\n";
         push(@defines, @{$compile_options{"${sourcefile}_DEFINES"}});
         push(@incpaths, @{$compile_options{"${sourcefile}_INCPATHS"}});
+#        print "Source File 3rd push!\n";
     }
     removeDuplicates();
 

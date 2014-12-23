@@ -1,0 +1,2 @@
+make[1]: *** No rule to make target `PM.stamp', needed by `perl.mak'.  Stop.
+make: *** [perl/perl.mak] Error 2
