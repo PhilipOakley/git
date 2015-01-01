@@ -375,14 +375,14 @@ This is useful for excluding servers inside a firewall from
 proxy use, while defaulting to a common proxy for external domains.
 
 core.ignoreStat::
-	If true, Git will normally not detect file changes by using lstat() calls.
-	When Git commands are used to modify files, Git will know that
-	they were modified (see "assume unchanged" bit in
-	linkgit:git-update-index[1].)
+	If true, Git will avoid using lstat() calls to detect if files have
+	changed. Git will set the "assume-unchanged" bit for those tracked files
+	which it has updated identically in both the index and working tree.
 +
 	When files are modified outside of Git, the user will need to stage
-	the modified files explicitly (e.g. by linkgit:git-add[1]); they will
-	not normally be reported as changed e.g. by linkgit:git-status[1].
+	the modified files explicitly (e.g. see 'Examples' section in
+	linkgit:git-update-index[1]).
+	Git will not normally detect changes to those files.
 +
 	This is useful on systems where lstat() calls are very slow, such as
 	CIFS/Microsoft Windows.
