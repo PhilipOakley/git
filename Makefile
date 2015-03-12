@@ -1721,9 +1721,14 @@ git.sp git.s git.o: EXTRA_CPPFLAGS = \
 	'-DGIT_MAN_PATH="$(mandir_relative_SQ)"' \
 	'-DGIT_INFO_PATH="$(infodir_relative_SQ)"'
 
+.PHONY: built-ins  # make only the built-ins, based on a separately compiled git$X
+built-ins: $(BUILT_INS)
+
+ifeq (,$(filter built-ins,$(MAKECMDGOALS)))  # do not build git$X if the goal is just the built-ins
 git$X: git.o GIT-LDFLAGS $(BUILTIN_OBJS) $(GITLIBS)
 	$(QUIET_LINK)$(CC) $(ALL_CFLAGS) -o $@ git.o \
 		$(BUILTIN_OBJS) $(ALL_LDFLAGS) $(LIBS)
+endif
 
 help.sp help.s help.o: common-cmds.h
 
