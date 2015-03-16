@@ -1721,9 +1721,10 @@ git.sp git.s git.o: EXTRA_CPPFLAGS = \
 	'-DGIT_MAN_PATH="$(mandir_relative_SQ)"' \
 	'-DGIT_INFO_PATH="$(infodir_relative_SQ)"'
 
-ifdef MSVC-DEPLOY
-.PHONY: built-ins  # make only the built-ins, based on a separately compiled git$X
-else
+.PHONY: msvc-deploy  # deploy only the built-ins, based on a separately compiled git$X
+msvc-deploy: $(BUILT_INS)
+
+ifeq (,$(filter msvc-deploy,$(MAKECMDGOALS)))  # do not build git$X if the goal is just to deploy the built-ins
 git$X: git.o GIT-LDFLAGS $(BUILTIN_OBJS) $(GITLIBS)
 	$(QUIET_LINK)$(CC) $(ALL_CFLAGS) -o $@ git.o \
 		$(BUILTIN_OBJS) $(ALL_LDFLAGS) $(LIBS)
@@ -1742,7 +1743,7 @@ version.sp version.s version.o: EXTRA_CPPFLAGS = \
 	'-DGIT_VERSION="$(GIT_VERSION)"' \
 	'-DGIT_USER_AGENT=$(GIT_USER_AGENT_CQ_SQ)'
 
-$(BUILT_INS): git$X built-ins # one, or the other, depending on MSVC-DEPLOY
+$(BUILT_INS): git$X
 	$(QUIET_BUILT_IN)$(RM) $@ && \
 	ln $< $@ 2>/dev/null || \
 	ln -s $< $@ 2>/dev/null || \
@@ -2351,7 +2352,11 @@ mergetools_instdir_SQ = $(subst ','\'',$(mergetools_instdir))
 
 install_bindir_programs := $(patsubst %,%$X,$(BINDIR_PROGRAMS_NEED_X)) $(BINDIR_PROGRAMS_NO_X)
 
-install: all
+ifneq (,$(filter msvc-deploy,$(MAKECMDGOALS)))
+install:: all
+endif
+
+install::
 	$(INSTALL) -d -m 755 '$(DESTDIR_SQ)$(bindir_SQ)'
 	$(INSTALL) -d -m 755 '$(DESTDIR_SQ)$(gitexec_instdir_SQ)'
 	$(INSTALL) $(ALL_PROGRAMS) '$(DESTDIR_SQ)$(gitexec_instdir_SQ)'
