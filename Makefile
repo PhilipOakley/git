@@ -2352,7 +2352,7 @@ mergetools_instdir_SQ = $(subst ','\'',$(mergetools_instdir))
 
 install_bindir_programs := $(patsubst %,%$X,$(BINDIR_PROGRAMS_NEED_X)) $(BINDIR_PROGRAMS_NO_X)
 
-ifneq (,$(filter msvc-deploy,$(MAKECMDGOALS)))
+ifneq (msvc-deploy,$(filter msvc-deploy,$(MAKECMDGOALS)))
 install:: all
 endif
 
