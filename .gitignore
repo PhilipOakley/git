@@ -247,5 +247,6 @@
 *.user
 *.idb
 *.pdb
-/Debug/
-/Release/
+*.manifest
+Debug/
+Release/
