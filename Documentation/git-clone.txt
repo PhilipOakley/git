@@ -3,7 +3,7 @@ git-clone(1)
 
 NAME
 ----
-git-clone - Clone a repository into a new directory
+git-clone - Clone a repository, creating a new directory for it
 
 
 SYNOPSIS
@@ -20,7 +20,7 @@ SYNOPSIS
 DESCRIPTION
 -----------
 
-Clones a repository into a newly created directory, creates
+Clones a repository, creating a new directory, then creates
 remote-tracking branches for each branch in the cloned repository
 (visible using `git branch -r`), and creates and checks out an
 initial branch that is forked from the cloned repository's
