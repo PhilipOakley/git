@@ -262,12 +262,11 @@ proc _append_recentrepos {path} {
 	set i [lsearch $recent $path]
 	if {$i >= 0} {
 		_unset_recentrepo $path
-		set recent [lreplace $recent $i $i]
 	}
 
-	lappend recent $path
 	git config --global --add gui.recentrepo $path
 	load_config 1
+	set recent [get_config gui.recentrepo]
 
 	if {[set maxrecent [get_config gui.maxrecentrepo]] eq {}} {
 		set maxrecent 10
@@ -275,7 +274,7 @@ proc _append_recentrepos {path} {
 
 	while {[llength $recent] > $maxrecent} {
 		_unset_recentrepo [lindex $recent 0]
-		set recent [lrange $recent 1 end]
+		set recent [get_config gui.recentrepo]
 	}
 }
 
