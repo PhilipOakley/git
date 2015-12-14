@@ -153,7 +153,7 @@ constructor pick {} {
 			-background [get_bg_color $w_body.recentlabel] \
 			-wrap none \
 			-width 50 \
-			-height $maxrecent
+			-height [expr {$maxrecent + 5}]
 		$w_recentlist tag conf link \
 			-foreground blue \
 			-underline 1
