@@ -393,7 +393,7 @@ static int write_bundle_refs(int bundle_fd, struct rev_info *revs)
 		write_or_die(bundle_fd, " ", 1);
 		write_or_die(bundle_fd, display_ref, strlen(display_ref));
 		/* if the display_ref is the HEAD symref then post fix its true identity */
-		if (!strcmp(display_ref, head_ref)) write_or_die(bundle_fd, "\0HEAD", 5);
+		if (!strcmp(display_ref, "HEAD")) write_or_die(bundle_fd, "\0HEAD", 5);
 		write_or_die(bundle_fd, "\n", 1);
  skip_write_ref:
 		free(ref);
