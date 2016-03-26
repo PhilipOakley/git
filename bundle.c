@@ -324,6 +324,7 @@ static int write_bundle_refs(int bundle_fd, struct rev_info *revs)
 		struct object_id oid;
 		char *ref;
 		const char *display_ref;
+		const char *head_ref = "";
 		int flag;
 
 		if (e->item->flags & UNINTERESTING)
@@ -333,6 +334,8 @@ static int write_bundle_refs(int bundle_fd, struct rev_info *revs)
 		if (read_ref_full(e->name, RESOLVE_REF_READING, oid.hash, &flag))
 			flag = 0;
 		display_ref = (flag & REF_ISSYMREF) ? e->name : ref;
+		/* is this the HEAD ref */
+		if (!strcmp(display_ref,"HEAD")) head_ref = ref;
 
 		if (e->item->type == OBJ_TAG &&
 				!is_tag_in_date_range(e->item, revs)) {
@@ -389,6 +392,8 @@ static int write_bundle_refs(int bundle_fd, struct rev_info *revs)
 		write_or_die(bundle_fd, oid_to_hex(&e->item->oid), 40);
 		write_or_die(bundle_fd, " ", 1);
 		write_or_die(bundle_fd, display_ref, strlen(display_ref));
+		/* if the display_ref is the HEAD symref then post fix its true identity */
+		if (!strcmp(display_ref, head_ref)) write_or_die(bundle_fd, "\0HEAD", 5);
 		write_or_die(bundle_fd, "\n", 1);
  skip_write_ref:
 		free(ref);
@@ -443,6 +448,8 @@ int create_bundle(struct bundle_header *header, const char *path,
 		return error(_("unrecognized argument: %s"), argv[1]);
 
 	object_array_remove_duplicates(&revs.pending);
+	/* change this to a sort (based on refname) & remove duplicates, so that HEAD is first
+	   use the ref-filter api and ref_array_sort (maybe) */
 
 	ref_count = write_bundle_refs(bundle_fd, &revs);
 	if (!ref_count)
