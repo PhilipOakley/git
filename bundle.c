@@ -10,7 +10,7 @@
 #include "refs.h"
 #include "argv-array.h"
 
-static const char bundle_signature[] = "# v2 git bundle\n";
+static const char bundle_signature[] = "# v2 git bundle\0# Rev 1, with symrefs\n";
 
 static void add_to_ref_list(const unsigned char *sha1, const char *name,
 		struct ref_list *list)
@@ -426,8 +426,8 @@ int create_bundle(struct bundle_header *header, const char *path,
 			die_errno("unable to dup file descriptor");
 	}
 
-	/* write signature */
-	write_or_die(bundle_fd, bundle_signature, strlen(bundle_signature));
+	/* write signature, including hidden revision number after the null */
+	write_or_die(bundle_fd, bundle_signature, (sizeof bundle_signature) - 1);
 
 	/* init revs to list objects for pack-objects later */
 	save_commit_buffer = 0;
