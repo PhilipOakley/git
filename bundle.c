@@ -321,6 +321,25 @@ static int write_bundle_refs(int bundle_fd, struct rev_info *revs)
 	struct strbuf head_ref = STRBUF_INIT;
 
 	for (i = 0; i < revs->pending.nr; i++) {
+		/* Find HEAD if it exists : dumb duplication of code! */
+		struct object_array_entry *e = revs->pending.objects + i;
+		struct object_id oid;
+		char *ref;
+		int flag;
+
+		if (e->item->flags & UNINTERESTING)
+			continue;
+		if (dwim_ref(e->name, strlen(e->name), oid.hash, &ref) != 1)
+			continue;
+		if (read_ref_full(e->name, RESOLVE_REF_READING, oid.hash, &flag))
+			flag = 0;
+		if ((flag & REF_ISSYMREF) && (!strcmp(e->name,"HEAD"))) {
+			strbuf_addstr(&head_ref, ref);
+			break;
+		}
+	}
+
+	for (i = 0; i < revs->pending.nr; i++) {
 		struct object_array_entry *e = revs->pending.objects + i;
 		struct object_id oid;
 		char *ref;
@@ -334,7 +353,6 @@ static int write_bundle_refs(int bundle_fd, struct rev_info *revs)
 		if (read_ref_full(e->name, RESOLVE_REF_READING, oid.hash, &flag))
 			flag = 0;
 		display_ref = (flag & REF_ISSYMREF) ? e->name : ref;
-		if (!strcmp(display_ref,"HEAD")) strbuf_addstr(&head_ref, ref);
 		if (e->item->type == OBJ_TAG &&
 				!is_tag_in_date_range(e->item, revs)) {
 			e->item->flags |= UNINTERESTING;
