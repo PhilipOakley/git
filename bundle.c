@@ -334,12 +334,7 @@ static int write_bundle_refs(int bundle_fd, struct rev_info *revs)
 		if (read_ref_full(e->name, RESOLVE_REF_READING, oid.hash, &flag))
 			flag = 0;
 		display_ref = (flag & REF_ISSYMREF) ? e->name : ref;
-		/* is this the HEAD ref */
-		if (!strcmp(display_ref,"HEAD")) {
-			//head_ref.buf = xstrdup(ref);
-			strbuf_addstr(&head_ref, ref);
-			write_or_die(bundle_fd, "Found HEAD", 10);
-		}
+		if (!strcmp(display_ref,"HEAD")) strbuf_addstr(&head_ref, ref);
 		if (e->item->type == OBJ_TAG &&
 				!is_tag_in_date_range(e->item, revs)) {
 			e->item->flags |= UNINTERESTING;
@@ -395,9 +390,6 @@ static int write_bundle_refs(int bundle_fd, struct rev_info *revs)
 		write_or_die(bundle_fd, oid_to_hex(&e->item->oid), 40);
 		write_or_die(bundle_fd, " ", 1);
 		write_or_die(bundle_fd, display_ref, strlen(display_ref));
-		write_or_die(bundle_fd, " ", 1);
-		write_or_die(bundle_fd, head_ref.buf, head_ref.len);
-		/* if the display_ref is the HEAD symref then post fix its true identity */
 		if (!strcmp(display_ref, head_ref.buf)) write_or_die(bundle_fd, "\0HEAD", 5);
 		write_or_die(bundle_fd, "\n", 1);
  skip_write_ref:
