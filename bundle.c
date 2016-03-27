@@ -318,13 +318,13 @@ static int write_bundle_refs(int bundle_fd, struct rev_info *revs)
 {
 	int i;
 	int ref_count = 0;
+	const char *head_ref = "";
 
 	for (i = 0; i < revs->pending.nr; i++) {
 		struct object_array_entry *e = revs->pending.objects + i;
 		struct object_id oid;
 		char *ref;
 		const char *display_ref;
-		const char *head_ref = "";
 		int flag;
 
 		if (e->item->flags & UNINTERESTING)
@@ -335,11 +335,7 @@ static int write_bundle_refs(int bundle_fd, struct rev_info *revs)
 			flag = 0;
 		display_ref = (flag & REF_ISSYMREF) ? e->name : ref;
 		/* is this the HEAD ref */
-		if (!strcmp(display_ref,"HEAD")) {
-			head_ref = ref;
-			write_or_die(bundle_fd, display_ref, strlen(display_ref));
-			write_or_die(bundle_fd, head_ref, strlen(head_ref));
-			}
+		if (!strcmp(display_ref,"HEAD")) head_ref = ref;
 		if (e->item->type == OBJ_TAG &&
 				!is_tag_in_date_range(e->item, revs)) {
 			e->item->flags |= UNINTERESTING;
@@ -395,12 +391,10 @@ static int write_bundle_refs(int bundle_fd, struct rev_info *revs)
 		write_or_die(bundle_fd, oid_to_hex(&e->item->oid), 40);
 		write_or_die(bundle_fd, " ", 1);
 		write_or_die(bundle_fd, display_ref, strlen(display_ref));
+		write_or_die(bundle_fd, " ", 1);
+		write_or_die(bundle_fd, head_ref, strlen(head_ref));
 		/* if the display_ref is the HEAD symref then post fix its true identity */
-		if (!strcmp(display_ref, "HEAD")) write_or_die(bundle_fd, "\0HEAD", 5);
-		/*
-		if (!strcmp(display_ref, "HEAD")) write_or_die(bundle_fd, head_ref, strlen(head_ref));
 		if (!strcmp(display_ref, head_ref)) write_or_die(bundle_fd, "\0HEAD", 5);
-		*/
 		write_or_die(bundle_fd, "\n", 1);
  skip_write_ref:
 		free(ref);
