@@ -335,8 +335,11 @@ static int write_bundle_refs(int bundle_fd, struct rev_info *revs)
 			flag = 0;
 		display_ref = (flag & REF_ISSYMREF) ? e->name : ref;
 		/* is this the HEAD ref */
-		if (!strcmp(display_ref,"HEAD")) head_ref = ref;
-
+		if (!strcmp(display_ref,"HEAD")) {
+			head_ref = ref;
+			write_or_die(bundle_fd, display_ref, strlen(display_ref));
+			write_or_die(bundle_fd, head_ref, strlen(head_ref));
+			}
 		if (e->item->type == OBJ_TAG &&
 				!is_tag_in_date_range(e->item, revs)) {
 			e->item->flags |= UNINTERESTING;
@@ -398,7 +401,6 @@ static int write_bundle_refs(int bundle_fd, struct rev_info *revs)
 		if (!strcmp(display_ref, "HEAD")) write_or_die(bundle_fd, head_ref, strlen(head_ref));
 		if (!strcmp(display_ref, head_ref)) write_or_die(bundle_fd, "\0HEAD", 5);
 		*/
-		write_or_die(bundle_fd, head_ref, strlen(head_ref));
 		write_or_die(bundle_fd, "\n", 1);
  skip_write_ref:
 		free(ref);
