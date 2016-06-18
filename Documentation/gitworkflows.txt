@@ -463,6 +463,178 @@ if you get conflicts: `git am -3` will use index information contained
 in patches to figure out the merge base.  See linkgit:git-am[1] for
 other options.
 
+TRIANGULAR WORKFLOW
+-------------------
+
+In some projects, you cannot push directly to the project but have to
+suggest your commits to the maintainer (e.g. pull requests).
+For these projects, it's common to use what's called a *triangular
+workflow*:
+
+- Taking the last version of the project by fetching from **UPSTREAM**
+- Writing modifications and push them to a fork (e.g. **PUBLISH**)
+- Opening a pull request
+- If the maintainer accepts the changes, he merges them into the
+  **UPSTREAM** repository.
+
+
+........................................
+------------------               -----------------
+| UPSTREAM       |  maintainer   | PUBLISH       |
+|  git/git       |- - - - - - - -|  me/remote    |
+------------------       ←       -----------------
+	      \                     /
+	       \                   /
+	  fetch↓\                 /↑push
+		 \               /
+		  \             /
+		   -------------
+		   |   LOCAL   |
+		   -------------
+........................................
+
+Motivations
+~~~~~~~~~~~
+
+* Allows contributors to work with Git even though they do not have
+write access to **UPSTREAM**.
+
+* Allows maintainers to receive code from contributors they may not
+trust.
+
+* Code review is more efficient
+
+* Encourages clean history by using `rebase -i` and `push --force` to
+your public fork before the code is merged
+
+Preparation
+~~~~~~~~~~~
+
+Cloning from **PUBLISH**, which is a fork of **UPSTREAM** or an empty
+repository.
+
+======================
+`git clone <PUBLISH_url>`
+======================
+
+Setting the behavior of push for the triangular workflow:
+
+===========================
+`git config push.default current`
+===========================
+
+Adding **UPSTREAM** remote:
+
+===================================
+`git remote add upstream <UPSTREAM_url>`
+===================================
+
+With the `remote add` above, using `git pull upstream` pulls there,
+instead of saying its URL. In addition, `git pull` can pull from
+**UPSTREAM** without argument.
+
+For each branch requiring a triangular workflow, set
+`branch.<branch>.remote` and `branch.<branch>.pushRemote`.
+
+Example with master as <branch>:
+===================================
+* `git config branch.master.remote upstream`
+* `git config branch.master.pushRemote origin`
+===================================
+
+Stay up-to-date
+~~~~~~~~~~~~~~~
+
+Retrieve updates from **UPSTREAM** with `git pull` and send them to
+**PUBLISH** with `git push`.
+
+Checks
+~~~~~~
+
+.Display the push remote's name:
+[caption="Recipe: "]
+
+=================================
+`git rev-parse --abbrev-ref @{push}`
+=================================
+
+The shorthand `<branch>@{push}` denotes the remote-tracking branch
+where the <branch> would be pushed to. If no <branch> is specified
+(`@{push}`), <branch> takes the value of the current branch.
+
+
+.Display the fetch remote's name:
+[caption="Recipe: "]
+
+===================================
+`git rev-parse --abbrev-ref @{upstream}`
+===================================
+
+The shorthand `<branch>@{upstream}` substitutes the upstream name of
+the branch. If no <branch> is specified (`@{upstream}`), <branch>
+takes the value of the current branch.
+
+.Display commits added to the current branch since last push:
+[caption="Recipe: "]
+
+===============
+`git log @{push}..`
+===============
+
+.Display commits added to a specific branch since last push:
+[caption="Recipe: "]
+
+============================
+`git log <branch_name>@{push}..`
+============================
+
+Alternative configuration
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.Cloning from **UPSTREAM**
+[caption="Recipe: "]
+
+In the preparation above, a clone from **PUBLISH** was used. Starting
+with a clone of **UPSTREAM** is possible too.
+
+Cloning from **UPSTREAM**
+
+======================
+`git clone <UPSTREAM_url>`
+======================
+
+Setting the behavior of push for the triangular workflow:
+
+===========================
+`git config push.default current`
+===========================
+
+Because modifications will be often pushed into the **PUBLISH** repository,
+instead of having to type its URL every time, a short name can be used
+to call it.
+
+Adding **PUBLISH** remote:
+
+===================================
+`git remote add publish <PUBLISH_url>`
+===================================
+
+With the `remote add` above, using `git push publish` pushes there,
+instead of saying its URL. In addition, `git push` can push to
+**PUBLISH** without argument.
+
+'Method 1: One option for all branches'
+
+===================================
+`git config remote.pushDefault publish`
+===================================
+
+'Method 2: Each branch its option'
+
+Example with master as <branch>:
+===================================
+`git config branch.master.pushRemote publish`
+===================================
 
 SEE ALSO
 --------
@@ -473,7 +645,10 @@ linkgit:git-merge[1],
 linkgit:git-rebase[1],
 linkgit:git-format-patch[1],
 linkgit:git-send-email[1],
-linkgit:git-am[1]
+linkgit:git-am[1],
+linkgit:git-config[1],
+linkgit:git-log[1],
+linkgit:git-rev-parse[1]
 
 GIT
 ---
