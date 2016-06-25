@@ -284,6 +284,10 @@ The 'r1{caret}@' notation means all parents of 'r1'.
 'r1{caret}!' notation includes commit 'r1' but excludes all of its parents.
 This is the single commit 'r1', if standalone.
 
+While '<rev>{caret}<n>' was about specifying a single commit parent, these
+two notations consider all its parents. For example you can say
+'HEAD{caret}2^@', however you cannot say 'HEAD{caret}@{caret}2'.
+
 Revision Range Summary
 ----------------------
 
