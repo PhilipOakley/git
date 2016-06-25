@@ -246,12 +246,16 @@ To exclude commits reachable from a commit, a prefix '{caret}'
 notation is used.  E.g. '{caret}r1 r2' means commits reachable
 from 'r2' but exclude the ones reachable from 'r1'.
 
+Single-Sided Difference (two dots)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 This set operation appears so often that there is a shorthand
 for it.  When you have two commits 'r1' and 'r2' (named according
 to the syntax explained in SPECIFYING REVISIONS above), you can ask
 for commits that are reachable from r2 excluding those that are reachable
 from r1 by '{caret}r1 r2' and it can be written as 'r1..r2'.
 
+Symmetric Difference (three dots)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 A similar notation 'r1\...r2' is called symmetric difference
 of 'r1' and 'r2' and is defined as
 'r1 r2 --not $(git merge-base --all r1 r2)'.
@@ -265,12 +269,17 @@ is a shorthand for 'HEAD..origin' and asks "What did the origin do since
 I forked from them?"  Note that '..' would mean 'HEAD..HEAD' which is an
 empty range that is both reachable and unreachable from HEAD.
 
+The '{caret}' Shorthands
+~~~~~~~~~~~~~~~~~~~~~~~~
 Two other shorthands for naming a set that is formed by a commit
-and its parent commits exist.  The 'r1{caret}@' notation means all
-parents of 'r1'.  'r1{caret}!' includes commit 'r1' but excludes
-all of its parents.
+and its parent commits exist.
 
-To summarize:
+The 'r1{caret}@' notation means all parents of 'r1'.
+
+'r1{caret}!' includes commit 'r1' but excludes all of its parents.
+
+Revision Range Summary
+----------------------
 
 '<rev>'::
 	Include commits that are reachable from (i.e. ancestors of)
