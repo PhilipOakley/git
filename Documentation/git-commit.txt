@@ -81,15 +81,15 @@ OPTIONS
 --fixup=<commit>::
 	Construct a commit message for use with `rebase --autosquash`.
 	The commit message will be the subject line from the specified
-	commit with a prefix of "fixup! ".  See linkgit:git-rebase[1]
-	for details.
+	commit revision with a prefix of "fixup! ".  See linkgit:git-rebase[1]
+	and linkgit:gitrevisions[7] for details.
 
 --squash=<commit>::
 	Construct a commit message for use with `rebase --autosquash`.
 	The commit message subject line is taken from the specified
-	commit with a prefix of "squash! ".  Can be used with additional
+	commit revision with a prefix of "squash! ".  Can be used with additional
 	commit message options (`-m`/`-c`/`-C`/`-F`). See
-	linkgit:git-rebase[1] for details.
+	linkgit:git-rebase[1] and linkgit:gitrevisions[7] for details.
 
 --reset-author::
 	When used with -C/-c/--amend options, or when committing after a
