@@ -421,7 +421,8 @@ without an explicit `--interactive`.
 --no-autosquash::
 	When the commit log message begins with "squash! ..." (or
 	"fixup! ..."), and there is a commit whose title begins with
-	the same ..., automatically modify the todo list of rebase -i
+	the same "..." message, or a commit object name (standalsone),
+	automatically modify the todo list of rebase -i
 	so that the commit marked for squashing comes right after the
 	commit to be modified, and change the action of the moved
 	commit from `pick` to `squash` (or `fixup`).  Ignores subsequent
