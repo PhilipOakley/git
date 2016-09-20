@@ -677,7 +677,7 @@ endif::git-rev-list[]
 
 --no-walk[=(sorted|unsorted)]::
 	Only show the given commits, but do not traverse their ancestors.
-	This has no effect if a range is specified. If the argument
+	This has no effect if a range or negative ref is specified. If the argument
 	`unsorted` is given, the commits are shown in the order they were
 	given on the command line. Otherwise (if `sorted` or no argument
 	was given), the commits are shown in reverse chronological order
