@@ -110,6 +110,12 @@ to point at the new commit.
 	dangling object has no references to it from any
 	reference or <<def_object,object>> in the <<def_repository,repository>>.
 
+[[def_decoration]]::
+	Objects that have a reference such as 'refs/heads/*', 'refs/tags/*' and
+	'refs/remotes/*' are said to be 'decorated'. Options are provided in
+	a number of commands, such as `git log`, to print and decorate those
+	object ID references.
+
 [[def_detached_HEAD]]detached HEAD::
 	Normally the <<def_HEAD,HEAD>> stores the name of a
 	<<def_branch,branch>>, and commands that operate on the
