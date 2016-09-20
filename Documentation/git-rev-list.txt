@@ -9,7 +9,21 @@ git-rev-list - Lists commit objects in reverse chronological order
 SYNOPSIS
 --------
 [verse]
-'git rev-list' [ --max-count=<number> ]
+'git rev-list' ...
+
+	     / Pseudo Revision Options /
+
+	     [ --not ]
+	     [ --all ]
+	     [ --branches[=<pattern>] ]
+	     [ --tags[=<pattern>] ]
+	     [ --remotes[=<pattern>] ]
+	     [ --reflog]
+	     [ --no-walk ] [ --do-walk ]
+
+	     / Regular options /
+
+	     [ --max-count=<number> ]
 	     [ --skip=<number> ]
 	     [ --max-age=<timestamp> ]
 	     [ --min-age=<timestamp> ]
@@ -23,11 +37,6 @@ SYNOPSIS
 	     [ --first-parent ]
 	     [ --remove-empty ]
 	     [ --full-history ]
-	     [ --not ]
-	     [ --all ]
-	     [ --branches[=<pattern>] ]
-	     [ --tags[=<pattern>] ]
-	     [ --remotes[=<pattern>] ]
 	     [ --glob=<glob-pattern> ]
 	     [ --ignore-missing ]
 	     [ --stdin ]
@@ -55,7 +64,6 @@ SYNOPSIS
 	     [ --merge ]
 	     [ --reverse ]
 	     [ --walk-reflogs ]
-	     [ --no-walk ] [ --do-walk ]
 	     [ --count ]
 	     [ --use-bitmap-index ]
 	     <commit>... [ \-- <paths>... ]
