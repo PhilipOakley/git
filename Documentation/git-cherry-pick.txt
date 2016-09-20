@@ -46,8 +46,9 @@ OPTIONS
 	Commits to cherry-pick.
 	For a more complete list of ways to spell commits, see
 	linkgit:gitrevisions[7].
-	Sets of commits can be passed but no traversal is done by
-	default, as if the '--no-walk' option was specified, see
+	Sets of commits can be passed but no traversal is done,
+	unless a range is included. The no traversal default
+	is as if the '--no-walk' option was specified, see
 	linkgit:git-rev-list[1]. Note that specifying a range will
 	feed all <commit>... arguments to a single revision walk
 	(see a later example that uses 'maint master..next').
@@ -167,6 +168,7 @@ EXAMPLES
 
 `git cherry-pick maint next ^master`::
 `git cherry-pick maint master..next`::
+`git cherry-pick master..maint master..next`::
 
 	Apply the changes introduced by all commits that are
 	ancestors of maint or next, but not master or any of its
