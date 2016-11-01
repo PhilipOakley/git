@@ -85,10 +85,10 @@ OPTIONS
 
 --[no-]assume-unchanged::
 	When this flag is specified, the object names recorded
-	for the paths are not updated.  Instead, this option
+	for the paths are not updated.  This option
 	sets/unsets the "assume unchanged" bit for the
 	paths.  When the "assume unchanged" bit is on, the user
-	promises not to change the file and allows Git to assume
+	*promises* not to change the file and allows Git to assume
 	that the working tree file matches what is recorded in
 	the index.  If you want to change the working tree file,
 	you need to unset the bit to tell Git.  This is
@@ -301,17 +301,23 @@ $ git ls-files -s
 Using ``assume unchanged'' bit
 ------------------------------
 
-Many operations in Git depend on your filesystem to have an
+Many operations in Git depend on your filesystem having a fast and
 efficient `lstat(2)` implementation, so that `st_mtime`
 information for working tree files can be cheaply checked to see
 if the file contents have changed from the version recorded in
 the index file.  Unfortunately, some filesystems have
 inefficient `lstat(2)`.  If your filesystem is one of them, you
-can set "assume unchanged" bit to paths you have not changed to
-cause Git not to do this check.  Note that setting this bit on a
-path does not mean Git will check the contents of the file to
-see if it has changed -- it makes Git to omit any checking and
-assume it has *not* changed.  When you make changes to working
+can set "assume unchanged" bit to *paths you have not changed* to
+cause Git not to do this check.
+
+Note that setting this bit on a
+path does not mean Git will never check the contents of the file to
+see if it has changed. Though normally it makes Git to omit any checking to
+assume it has not changed.
+Commands which may overwrite local changes (pull/merge etc) are
+likely to check if the contents have changed
+
+If you make desired changes to working
 tree files, you have to explicitly tell Git about it by dropping
 "assume unchanged" bit, either before or after you modify them.
 
