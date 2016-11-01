@@ -412,14 +412,16 @@ ifeq ($(uname_S),Windows)
 	MSVC_SDK10 = c:/Program Files (x86)/Windows Kits/10
 	MSVC_VCDIR = c:/Program Files (x86)/Microsoft Visual Studio 14.0/VC
 	BASIC_CFLAGS += \
-		     -I "$(MSVC_DEPS)/include" -I "$(MSVC_DEPS)/include/expat" -I "$(MSVC_DEPS)/include/zlib" \
-		     -L "$(MSVC_DEPS)/lib" \
-		     -I "$(MSVC_SDK81)/Include/um" -I "$(MSVC_SDK81)/Include/shared" \
-		     -L "$(MSVC_SDK81)/lib/winv6.3/um/x64" \
-		     -I "$(MSVC_SDK10)/Include/10.0.10240.0/ucrt" \
-		     -L "$(MSVC_SDK10)/lib/10.0.10240.0/ucrt/x64" \
-		     -I "$(MSVC_VCDIR)/INCLUDE" \
-		     -L "$(MSVC_VCDIR)/lib/amd64"
+		     -I"$(MSVC_DEPS)/include" -I"$(MSVC_DEPS)/include/expat" -I"$(MSVC_DEPS)/include/zlib" \
+		     -I"$(MSVC_SDK81)/Include/um" -I"$(MSVC_SDK81)/Include/shared" \
+		     -I"$(MSVC_SDK10)/Include/10.0.10240.0/ucrt" \
+		     -I"$(MSVC_VCDIR)/INCLUDE" \
+
+	BASIC_LDFLAGS += \
+		     -L"$(MSVC_DEPS)/lib" \
+		     -L"$(MSVC_SDK81)/lib/winv6.3/um/x64" \
+		     -L"$(MSVC_SDK10)/lib/10.0.10240.0/ucrt/x64" \
+		     -L"$(MSVC_VCDIR)/lib/amd64"
 	# Optionally enable memory leak reporting.
 	# BASIC_CLFAGS += -DUSE_MSVC_CRTDBG
 	BASIC_CFLAGS += -DPROTECT_NTFS_DEFAULT=1
