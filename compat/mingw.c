@@ -1238,6 +1238,7 @@ static wchar_t *make_environment_block(char **deltaenv)
 	int nr_delta_del = 0;
 	int nr_wenv = 0;
 	int j, k, k_ins, k_del;
+	int len_j_eq, len_j;
 
 	/*
 	 * Count the number of inserts and deletes in the deltaenv list.
@@ -1315,7 +1316,7 @@ static wchar_t *make_environment_block(char **deltaenv)
 		wchar_t *v_j_eq = wcschr(v_j, L'=');
 		if (!v_j_eq)
 			continue; /* should not happen */
-		int len_j_eq = v_j_eq + 1 - v_j; /* length(v_j) including '=' */
+		len_j_eq = v_j_eq + 1 - v_j; /* length(v_j) including '=' */
 
 		/* lookup v_j in list of to-delete vars */
 		for (k_del = 0; k_del < nr_delta_del; k_del++) {
@@ -1330,7 +1331,7 @@ static wchar_t *make_environment_block(char **deltaenv)
 		}
 
 		/* item is unique, add it to results. */
-		int len_j = wcslen(v_j);
+		len_j = wcslen(v_j);
 		memcpy(w_ins, v_j, len_j * sizeof(wchar_t));
 		w_ins += len_j + 1;
 
@@ -2977,6 +2978,7 @@ int msc_startup(int argc, wchar_t **w_argv, wchar_t **w_env)
 	char *buffer = NULL;
 	int maxlen;
 	int k, x;
+	int exit_status;
 
 #ifdef USE_MSVC_CRTDBG
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
@@ -3025,7 +3027,7 @@ int msc_startup(int argc, wchar_t **w_argv, wchar_t **w_env)
 	current_directory_len = GetCurrentDirectoryW(0, NULL);
 
 	/* invoke the real main() using our utf8 version of argv. */
-	int exit_status = msc_main(argc, my_utf8_argv);
+	exit_status = msc_main(argc, my_utf8_argv);
 
 	for (k = 0; k < argc; k++)
 		free(save[k]);
