@@ -119,11 +119,13 @@ sub createLibProject {
     foreach (@tmp) {
         if (/^-LTCG/) {
         } elsif (/^-L/) {
-            $_ =~ s/^-L/-LIBPATH:$rel_dir\//;
+            $_ =~ s/^-L//;
+            $_ =~ s/"//g;
+            $_ =~ s/(.*)/-LIBPATH:&quot;$rel_dir\/$1&quot;/;
         }
         push(@tmp2, $_);
     }
-    my $lflags = join(" ", sort(@tmp));
+    my $lflags = join(" ", sort(@tmp2));
 
     $defines =~ s/-D//g;
     $defines =~ s/\"/\\&quot;/g;
@@ -343,11 +345,13 @@ sub createAppProject {
     foreach (@tmp) {
         if (/^-LTCG/) {
         } elsif (/^-L/) {
-            $_ =~ s/^-L/-LIBPATH:$rel_dir\//;
+            $_ =~ s/^-L//;
+            $_ =~ s/"//g;
+            $_ =~ s/(.*)/-LIBPATH:&quot;$rel_dir\/$1&quot;/;
         }
         push(@tmp2, $_);
     }
-    my $lflags = join(" ", sort(@tmp)) . " -LIBPATH:$rel_dir";
+    my $lflags = join(" ", sort(@tmp2)) . " -LIBPATH:&quot;$rel_dir&quot;";
 
     $defines =~ s/-D//g;
     $defines =~ s/\"/\\&quot;/g;
