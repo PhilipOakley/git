@@ -363,12 +363,12 @@ ifeq ($(uname_S),Windows)
 	NO_MKDTEMP = YesPlease
 	NO_MKSTEMPS = YesPlease
 	# VS2015 with UCRT claims that snprintf and friends are C99 compliant,
-	# so we don't need this.
+	# so we don't need this SNPRINTF_RETURNS_BOGUS.
 	#
-	# TODO If we want to support older compilers, we need to make this
-	# TODO conditional on the compiler version.
+	# to support older compilers, e.g. VS2008, we need to make this
+	# conditional on the compiler version. We do this in git-compat-util.h
 	#
-	# SNPRINTF_RETURNS_BOGUS = YesPlease
+	SNPRINTF_RETURNS_BOGUS = YesPlease
 	NO_SVN_TESTS = YesPlease
 	RUNTIME_PREFIX = YesPlease
 	NO_ST_BLOCKS_IN_STRUCT_STAT = YesPlease
