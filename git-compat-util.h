@@ -771,6 +771,7 @@ extern FILE *git_fopen(const char*, const char*);
 #endif
 
 #ifdef SNPRINTF_RETURNS_BOGUS
+#if !(_MSC_VER >= 1900)
 #ifdef snprintf
 #undef snprintf
 #endif
@@ -783,6 +784,7 @@ extern int git_snprintf(char *str, size_t maxsize,
 #define vsnprintf git_vsnprintf
 extern int git_vsnprintf(char *str, size_t maxsize,
 			 const char *format, va_list ap);
+#endif
 #endif
 
 #ifdef __GLIBC_PREREQ
