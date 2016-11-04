@@ -1,5 +1,8 @@
 #ifdef __MINGW64_VERSION_MAJOR
+#if (_MSC_VER>1500)
 #include <stdint.h>
+/* stdint.h is not in C89 which VS2008 uses */
+#endif
 #include <wchar.h>
 typedef _sigset_t sigset_t;
 #endif

@@ -60,7 +60,9 @@
    GNU regex allows.  Include it before <regex.h>, which correctly
    #undefs RE_DUP_MAX and sets it to the right value.  */
 #include <limits.h>
+#if ((defined (_MSC_VER)) && (_MSC_VER>1500))
 #include <stdint.h>
+#endif
 
 #ifdef GAWK
 #undef alloca
