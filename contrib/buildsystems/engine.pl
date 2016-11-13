@@ -322,6 +322,9 @@ sub handleLinkLine
             # eat compiler flags
         } elsif ("$part" eq "-o") {
             $appout = shift @parts;
+        } elsif ("$part" =~ /^\//) {
+            # VS slash /DIRECTIVEs
+            push(@libs, $part);
         } elsif ("$part" eq "-lz") {
             push(@libs, "zlib.lib");
 	} elsif ("$part" eq "-lcrypto") {
