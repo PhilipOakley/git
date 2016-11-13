@@ -1,4 +1,4 @@
-#include <inttypes.h>
+/* #include <inttypes.h> /* this is not a C89 library */
 #include "git-compat-util.h"
 #include "run-command.h"
 #include "compat/terminal.h"
