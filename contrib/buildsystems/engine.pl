@@ -73,6 +73,7 @@ Running GNU Make to figure out build structure...
 EOM
 
 # Pipe a make --dry-run into a variable, if not already loaded from file
+@makedry = `cd $git_dir && make -n MSVC=1 V=1 1>makedry.txt 2>/dev/null` if !@makedry;
 @makedry = `cd $git_dir && make -n MSVC=1 V=1 2>/dev/null` if !@makedry;
 
 # Parse the make output into usable info
