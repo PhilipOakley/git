@@ -357,7 +357,7 @@ sub createAppProject {
 
     $defines =~ s/-D//g;
     $defines =~ s/\"/\\&quot;/g;
-    $defines =~ s/\>/\\&gt;/g;
+    $defines =~ s/\>/\\&gt;/g; 
     $defines =~ s/\</\\&lt;/g;
     $defines =~ s/\'//g;
     $defines =~ s/\\\\/\\/g;
