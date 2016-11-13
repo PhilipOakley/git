@@ -47,7 +47,8 @@ test -z "$to_ignore" || {
 	sed 's/^/\//' >> .git/info/exclude
 } || exit
 
-test -d msvcgit || git clone git://repo.or.cz/msvcgit.git
+# test for the Nuget dependecies introduced for VS2015 compilation
+test -d compat/vcbuild/GEN.DEPS || make -C compat/vcbuild
 
 vsvars=
 # assume cl.exe will populate its relevant environment variables
