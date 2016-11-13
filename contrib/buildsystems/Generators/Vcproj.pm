@@ -129,8 +129,8 @@ sub createLibProject {
 
     $defines =~ s/-D//g;
     $defines =~ s/\"/\\&quot;/g;
-    $defines =~ s/\>/\\&gt;/g;
-    $defines =~ s/\</\\&lt;/g;
+    $defines =~ s/>/\&gt;/g;
+    $defines =~ s/</\&lt;/g;
     $defines =~ s/\'//g;
     $includes =~ s/-I//g;
     mkdir "$target" || die "Could not create the directory $target for lib project!\n";
