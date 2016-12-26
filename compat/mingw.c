@@ -2623,7 +2623,7 @@ typedef struct _REPARSE_DATA_BUFFER {
 		struct {
 			BYTE   DataBuffer[1];
 		} GenericReparseBuffer;
-	} ;
+	} DUMMYUNIONNAME;
 } REPARSE_DATA_BUFFER, *PREPARSE_DATA_BUFFER;
 
 #if defined(_MSC_VER) && _MSC_VER < 1900
