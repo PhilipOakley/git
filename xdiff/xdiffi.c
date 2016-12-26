@@ -20,6 +20,7 @@
  *
  */
 
+#include "git-compat-util.h"
 #include "xinclude.h"
 
 
