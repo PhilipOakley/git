@@ -1,4 +1,12 @@
- - [ ] I was not able to find an [open](https://github.com/git-for-windows/git/issues?q=is%3Aopen) or [closed](https://github.com/git-for-windows/git/issues?q=is%3Aclosed) issue matching what I'm seeing
+## Have any similar issues already been reported ?
+Please search the previously reported issues...
+
+[open issues](https://github.com/git-for-windows/git/issues?q=is%3Aopen)
+[closed issues](https://github.com/git-for-windows/git/issues?q=is%3Aclosed)
+[all issues](https://github.com/git-for-windows/git/issues?q=)
+ Adjust the *Filters box* and search terms as required.
+
+ - [ ] I was not able to find a relevant issue.
 
 ### Setup
 
@@ -22,7 +30,7 @@ $ cmd.exe /c ver
    defaults?
 
 ```
-# One of the following:
+# Use one of the following:
 > type "C:\Program Files\Git\etc\install-options.txt"
 > type "C:\Program Files (x86)\Git\etc\install-options.txt"
 > type "%USERPROFILE%\AppData\Local\Programs\Git\etc\install-options.txt"
@@ -61,3 +69,9 @@ $ cat /etc/install-options.txt
    URL to that repository to help us with testing?
 
 ** insert URL here **
+
+
+- Check the Preview tab to see how this will look.
+
+Need help on [Markdown](https://guides.github.com/features/mastering-markdown/)?
+or see the [cheatsheet](https://guides.github.com/pdfs/markdown-cheatsheet-online.pdf).
