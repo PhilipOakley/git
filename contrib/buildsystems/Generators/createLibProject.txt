@@ -1,0 +1,219 @@
+sub createLibProject {
+    my ($libname, $git_dir, $out_dir, $rel_dir, $build_structure) = @_;
+    print "Generate $libname vcproj lib project\n";
+    $rel_dir = "..\\$rel_dir";
+    $rel_dir =~ s/\//\\/g;
+
+    my $target = $libname;
+    $target =~ s/\//_/g;
+    $target =~ s/\.a//;
+
+    my $uuid = $GUIDS[$guid_index];
+    $$build_structure{"LIBS_${target}_GUID"} = $uuid;
+    $guid_index += 1;
+
+    my @srcs = sort(map("$rel_dir\\$_", @{$$build_structure{"LIBS_${libname}_SOURCES"}}));
+    my @sources;
+    foreach (@srcs) {
+        $_ =~ s/\//\\/g;
+        push(@sources, $_);
+    }
+    my $defines = join(",", sort(@{$$build_structure{"LIBS_${libname}_DEFINES"}}));
+    my $includes= join(";", sort(map("&quot;$rel_dir\\$_&quot;", @{$$build_structure{"LIBS_${libname}_INCLUDES"}})));
+    my $cflags  = join(" ", sort(map { s/^-[GLMOZ].*//; s/.* .*/"$&"/; $_; } @{$$build_structure{"LIBS_${libname}_CFLAGS"}}));
+print STDERR "clfags: $cflags\n";
+    $cflags =~ s/\"/&quot;/g;
+    $cflags =~ s/</&lt;/g;
+    $cflags =~ s/>/&gt;/g;
+
+    my $cflags_debug = $cflags;
+    $cflags_debug =~ s/-MT/-MTd/;
+    $cflags_debug =~ s/-O.//;
+
+    my $cflags_release = $cflags;
+    $cflags_release =~ s/-MTd/-MT/;
+
+    my @tmp  = @{$$build_structure{"LIBS_${libname}_LFLAGS"}};
+    my @tmp2 = ();
+    foreach (@tmp) {
+        if (/^-LTCG/) {
+        } elsif (/^-L/) {
+            $_ =~ s/^-L//;
+            $_ =~ s/"//g;
+            $_ =~ s/(.*)/-LIBPATH:&quot;$rel_dir\/$1&quot;/;
+        }
+        push(@tmp2, $_);
+    }
+    my $lflags = join(" ", sort(@tmp2));
+
+    $defines =~ s/-D//g;
+    $defines =~ s/\"/\\&quot;/g;
+    $defines =~ s/</&lt;/g;
+    $defines =~ s/>/&gt;/g;
+    $defines =~ s/\'//g;
+    $includes =~ s/-I//g;
+    mkdir "$target" || die "Could not create the directory $target for lib project!\n";
+    open F, ">$target/$target.vcproj" || die "Could not open $target/$target.pro for writing!\n";
+    binmode F, ":crlf";
+    print F << "EOM";
+<?xml version="1.0" encoding = "Windows-1252"?>
+<VisualStudioProject
+	ProjectType="Visual C++"
+	Version="9,00"
+	Name="$target"
+	ProjectGUID="$uuid">
+	<Platforms>
+		<Platform
+			Name="Win32"/>
+	</Platforms>
+	<ToolFiles>
+	</ToolFiles>
+	<Configurations>
+		<Configuration
+			Name="Debug|Win32"
+			OutputDirectory="$rel_dir"
+			ConfigurationType="4"
+			CharacterSet="0"
+			IntermediateDirectory="\$(ProjectDir)\$(ConfigurationName)"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				AdditionalOptions="$cflags_debug"
+				Optimization="0"
+				InlineFunctionExpansion="1"
+				AdditionalIncludeDirectories="$includes"
+				PreprocessorDefinitions="WIN32,_DEBUG,$defines"
+				MinimalRebuild="true"
+				RuntimeLibrary="1"
+				UsePrecompiledHeader="0"
+				ProgramDataBaseFileName="\$(IntDir)\\\$(TargetName).pdb"
+				WarningLevel="3"
+				DebugInformationFormat="3"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLibrarianTool"
+				SuppressStartupBanner="true"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+			/>
+		</Configuration>
+		<Configuration
+			Name="Release|Win32"
+			OutputDirectory="$rel_dir"
+			ConfigurationType="4"
+			CharacterSet="0"
+			WholeProgramOptimization="1"
+			IntermediateDirectory="\$(ProjectDir)\$(ConfigurationName)"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				AdditionalOptions="$cflags_release"
+				Optimization="2"
+				InlineFunctionExpansion="1"
+				EnableIntrinsicFunctions="true"
+				AdditionalIncludeDirectories="$includes"
+				PreprocessorDefinitions="WIN32,NDEBUG,$defines"
+				RuntimeLibrary="0"
+				EnableFunctionLevelLinking="true"
+				UsePrecompiledHeader="0"
+				ProgramDataBaseFileName="\$(IntDir)\\\$(TargetName).pdb"
+				WarningLevel="3"
+				DebugInformationFormat="3"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLibrarianTool"
+				SuppressStartupBanner="true"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+			/>
+		</Configuration>
+	</Configurations>
+	<Files>
+		<Filter
+			Name="Source Files"
+			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
+			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
+EOM
+    foreach(@sources) {
+        print F << "EOM";
+			<File
+				RelativePath="$_"/>
+EOM
+    }
+    print F << "EOM";
+		</Filter>
+	</Files>
+	<Globals>
+	</Globals>
+</VisualStudioProject>
+EOM
+    close F;
+}

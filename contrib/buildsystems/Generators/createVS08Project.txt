@@ -1,0 +1,263 @@
+sub createProject {
+    my ($name, $git_dir, $out_dir, $rel_dir, $build_structure, $static_library) = @_;
+    my $label = $static_library ? "lib" : "app";
+    my $prefix = $static_library ? "LIBS_" : "APPS_";
+#    my $config_type = $static_library ? "StaticLibrary" : "Application";
+    my $config_type = $static_library ? "4" : "1";
+    print "Generate $name vcproj $label project\n";
+    my $cdup = $name;
+    $cdup =~ s/[^\/]+/../g;
+    $cdup =~ s/\//\\/g;
+    $rel_dir = $rel_dir eq "." ? $cdup : "$cdup\\$rel_dir";
+    $rel_dir =~ s/\//\\/g;
+
+    my $target = $name;
+    if ($static_library) {
+      $target =~ s/\.a//;
+    } else {
+      $target =~ s/\.exe//;
+    }
+
+    my $uuid = $GUIDS[$guid_index++];
+    $$build_structure{"$prefix${target}_GUID"} = $uuid;
+    my $vcproj = $target;
+    $vcproj =~ s/(.*\/)?(.*)/$&\/$2.vcproj/;
+    $vcproj =~ s/([^\/]*)(\/lib)\/(lib.vcproj)/$1$2\/$1_$3/;
+    $$build_structure{"$prefix${target}_VCPROJ"} = $vcproj;
+
+    my @srcs = sort(map("$rel_dir\\$_", @{$$build_structure{"$prefix${name}_SOURCES"}}));
+    my @sources;
+    foreach (@srcs) {
+        $_ =~ s/\//\\/g;
+        push(@sources, $_);
+    }
+    my $defines = join(";", sort(@{$$build_structure{"$prefix${name}_DEFINES"}}));
+    my $includes= join(";", sort(map { s/^-I//; s/\//\\/g; File::Spec->file_name_is_absolute($_) ? $_ : "$rel_dir\\$_" } @{$$build_structure{"$prefix${name}_INCLUDES"}}));
+    my $cflags = join(" ", sort(map { s/^-[GLMOZ].*//; s/.* .*/"$&"/; $_; } @{$$build_structure{"$prefix${name}_CFLAGS"}}));
+    $cflags =~ s/\"/&quot;/g;
+    $cflags =~ s/</&lt;/g;
+    $cflags =~ s/>/&gt;/g;
+
+    my $libs = '';
+    if (!$static_library) {
+      $libs = join(";", sort(grep /^(?!libgit\.lib|xdiff\/lib\.lib|vcs-svn\/lib\.lib|libcurl\.lib|libeay32\.lib|libiconv\.lib|ssleay32\.lib|zlib\.lib)/, @{$$build_structure{"$prefix${name}_LIBS"}}));
+    }
+    my $ldirs = join(";", map { /^-L(?!TCG)(.*)/ ? (File::Spec->file_name_is_absolute($1) ? $1 : "$rel_dir\\$1") : () } @{$$build_structure{"$prefix${name}_LFLAGS"}});
+
+    $defines =~ s/-D//g;
+    $defines =~ s/\"/&quot;/g;
+    $defines =~ s/</&lt;/g;
+    $defines =~ s/>/&gt;/g;
+    $defines =~ s/\'//g;
+
+    die "Could not create the directory $target for $label project!\n" unless (-d "$target" || mkdir "$target");
+
+    use File::Copy;
+    copy("$git_dir/compat/vcbuild/packages.config", "$target/packages.config");
+
+    my $needsCurl = grep(/libcurl.lib/, @{$$build_structure{"$prefix${name}_LIBS"}});
+    my $targetsImport = '';
+    my $targetsErrors = '';
+    my $afterTargets = '';
+    open F, "<$git_dir/compat/vcbuild/packages.config";
+    while (<F>) {
+      if (/<package id="([^"]+)" version="([^"]+)"/) {
+        if ($1 eq 'libiconv') {
+	  # we have to link with the Release builds already because libiconv
+	  # is only available targeting v100 and v110, see
+	  # https://github.com/coapp-packages/libiconv/issues/2
+          $libs .= ";$rel_dir\\compat\\vcbuild\\GEN.PKGS\\$1.$2\\build\\native\\lib\\v110\\\$(Platform)\\Release\\dynamic\\cdecl\\libiconv.lib";
+	  $afterTargets .= "\n    <Copy SourceFiles=\"$rel_dir\\compat\\vcbuild\\GEN.PKGS\\$1.redist.$2\\build\\native\\bin\\v110\\\$(Platform)\\Release\\dynamic\\cdecl\\libiconv.dll\" DestinationFolder=\"\$(TargetDir)\" SkipUnchangedFiles=\"true\" />";
+        } elsif ($needsCurl && $1 eq 'curl') {
+	  # libcurl is only available targeting v100 and v110
+	  $libs .= ";$rel_dir\\compat\\vcbuild\\GEN.PKGS\\$1.$2\\build\\native\\lib\\v110\\\$(Platform)\\Release\\dynamic\\libcurl.lib";
+	  $afterTargets .= "\n    <Copy SourceFiles=\"$rel_dir\\compat\\vcbuild\\GEN.PKGS\\$1.redist.$2\\build\\native\\bin\\v110\\\$(Platform)\\Release\\dynamic\\libcurl.dll\" DestinationFolder=\"\$(TargetDir)\" SkipUnchangedFiles=\"true\" />";
+        } elsif ($needsCurl && $1 eq 'expat') {
+	  # libexpat is only available targeting v100 and v110
+	  $libs .= ";$rel_dir\\compat\\vcbuild\\GEN.PKGS\\$1.$2\\build\\native\\lib\\v110\\\$(Platform)\\Release\\dynamic\\utf8\\libexpat.lib";
+	}
+        next if ($1 =~  /^(zlib$|openssl(?!.*(x64|x86)$))/);
+        my $targetsFile = "$rel_dir\\compat\\vcbuild\\GEN.PKGS\\$1.$2\\build\\native\\$1.targets";
+        $targetsImport .= "\n    <Import Project=\"$targetsFile\" Condition=\"Exists('$targetsFile')\" />";
+        $targetsErrors .= "\n    <Error Condition=\"!Exists('$targetsFile')\" Text=\"\$([System.String]::Format('\$(ErrorText)', '$targetsFile'))\" />";
+      }
+    }
+    close F;
+
+    open F, ">$vcproj" or die "Could not open $vcproj for writing!\n";
+    binmode F, ":crlf :utf8";
+ #   print F chr(0xFEFF);
+    print F << "EOM";
+<?xml version="1.0" encoding = "Windows-1252"?>
+<VisualStudioProject
+	ProjectType="Visual C++"
+	Version="9,00"
+	Name="$target"
+	ProjectGUID="$uuid">
+	<Platforms>
+		<Platform
+			Name="Win32"/>
+	</Platforms>
+	<ToolFiles>
+	</ToolFiles>
+	<Configurations>
+		<Configuration
+			Name="Debug|Win32"
+			OutputDirectory="$rel_dir"
+			ConfigurationType="1"
+			CharacterSet="0"
+			IntermediateDirectory="\$(ProjectDir)\$(ConfigurationName)"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				AdditionalOptions="$cflags_debug"
+				Optimization="0"
+				InlineFunctionExpansion="1"
+				AdditionalIncludeDirectories="$includes"
+				PreprocessorDefinitions="WIN32,_DEBUG,$defines"
+				MinimalRebuild="true"
+				RuntimeLibrary="1"
+				UsePrecompiledHeader="0"
+				ProgramDataBaseFileName="\$(IntDir)\\\$(TargetName).pdb"
+				WarningLevel="3"
+				DebugInformationFormat="3"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalDependencies="$libs"
+				AdditionalOptions="$lflags"
+				LinkIncremental="2"
+				GenerateDebugInformation="true"
+				SubSystem="1"
+				TargetMachine="1"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+			/>
+		</Configuration>
+		<Configuration
+			Name="Release|Win32"
+			OutputDirectory="$rel_dir"
+			ConfigurationType="1"
+			CharacterSet="0"
+			WholeProgramOptimization="1"
+			IntermediateDirectory="\$(ProjectDir)\$(ConfigurationName)"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				AdditionalOptions="$cflags_release"
+				Optimization="2"
+				InlineFunctionExpansion="1"
+				EnableIntrinsicFunctions="true"
+				AdditionalIncludeDirectories="$includes"
+				PreprocessorDefinitions="WIN32,NDEBUG,$defines"
+				RuntimeLibrary="0"
+				EnableFunctionLevelLinking="true"
+				UsePrecompiledHeader="0"
+				ProgramDataBaseFileName="\$(IntDir)\\\$(TargetName).pdb"
+				WarningLevel="3"
+				DebugInformationFormat="3"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalDependencies="$libs"
+				AdditionalOptions="$lflags"
+				LinkIncremental="1"
+				GenerateDebugInformation="true"
+				SubSystem="1"
+				TargetMachine="1"
+				OptimizeReferences="2"
+				EnableCOMDATFolding="2"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+			/>
+		</Configuration>
+	</Configurations>
+	<Files>
+		<Filter
+			Name="Source Files"
+			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
+			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
+EOM
+    foreach(@sources) {
+        print F << "EOM";
+			<File
+				RelativePath="$_"/>
+EOM
+    }
+    print F << "EOM";
+		</Filter>
+	</Files>
+	<Globals>
+	</Globals>
+</VisualStudioProject>
+EOM
+    close F;
+}
