@@ -83,7 +83,7 @@ int init_tree_desc_gently(struct tree_desc *desc, const void *buffer, unsigned l
 
 void *fill_tree_descriptor(struct tree_desc *desc, const struct object_id *oid)
 {
-	unsigned long size = 0;
+	size_t size = 0;
 	void *buf = NULL;
 
 	if (oid) {
@@ -109,8 +109,8 @@ static int update_tree_entry_internal(struct tree_desc *desc, struct strbuf *err
 {
 	const void *buf = desc->buffer;
 	const unsigned char *end = (const unsigned char *)desc->entry.path + desc->entry.pathlen + 1 + the_hash_algo->rawsz;
-	unsigned long size = desc->size;
-	unsigned long len = end - (const unsigned char *)buf;
+	size_t size = desc->size;
+	size_t len = end - (const unsigned char *)buf;
 
 	if (size < len)
 		die(_("too-short tree file"));
@@ -496,7 +496,7 @@ int traverse_trees(struct index_state *istate,
 
 struct dir_state {
 	void *tree;
-	unsigned long size;
+	size_t size;
 	struct object_id oid;
 };
 
@@ -539,7 +539,7 @@ int get_tree_entry(const struct object_id *tree_oid, const char *name, struct ob
 {
 	int retval;
 	void *tree;
-	unsigned long size;
+	size_t size;
 	struct object_id root;
 
 	tree = read_object_with_reference(tree_oid, tree_type, &size, &root);
@@ -608,7 +608,7 @@ enum get_oid_result get_tree_entry_follow_symlinks(struct object_id *tree_oid, c
 		if (!t.buffer) {
 			void *tree;
 			struct object_id root;
-			unsigned long size;
+			size_t size;
 			tree = read_object_with_reference(&current_tree_oid,
 							  tree_type, &size,
 							  &root);
@@ -704,7 +704,7 @@ enum get_oid_result get_tree_entry_follow_symlinks(struct object_id *tree_oid, c
 			goto done;
 		} else if (S_ISLNK(*mode)) {
 			/* Follow a symlink */
-			unsigned long link_len;
+			size_t link_len;
 			size_t len;
 			char *contents, *contents_start;
 			struct dir_state *parent;

@@ -360,7 +360,7 @@ static void check_connectivity(void)
 	}
 }
 
-static int fsck_obj(struct object *obj, void *buffer, unsigned long size)
+static int fsck_obj(struct object *obj, void *buffer, size_t size)
 {
 	int err;
 
@@ -408,7 +408,7 @@ out:
 }
 
 static int fsck_obj_buffer(const struct object_id *oid, enum object_type type,
-			   unsigned long size, void *buffer, int *eaten)
+			   size_t size, void *buffer, int *eaten)
 {
 	/*
 	 * Note, buffer may be NULL if type is OBJ_BLOB. See
@@ -563,7 +563,7 @@ static int fsck_loose(const struct object_id *oid, const char *path, void *data)
 {
 	struct object *obj;
 	enum object_type type;
-	unsigned long size;
+	size_t size;
 	void *contents;
 	int eaten;
 

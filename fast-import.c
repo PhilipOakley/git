@@ -895,7 +895,7 @@ static int store_object(
 	struct object_entry *e;
 	unsigned char hdr[96];
 	struct object_id oid;
-	unsigned long hdrlen, deltalen;
+	size_t hdrlen, deltalen;
 	git_hash_ctx c;
 	git_zstream s;
 
@@ -1036,7 +1036,7 @@ static void stream_blob(uintmax_t len, struct object_id *oidout, uintmax_t mark)
 	unsigned char *out_buf = xmalloc(out_sz);
 	struct object_entry *e;
 	struct object_id oid;
-	unsigned long hdrlen;
+	size_t hdrlen;
 	off_t offset;
 	git_hash_ctx c;
 	git_zstream s;
@@ -1154,7 +1154,7 @@ static void stream_blob(uintmax_t len, struct object_id *oidout, uintmax_t mark)
  */
 static void *gfi_unpack_entry(
 	struct object_entry *oe,
-	unsigned long *sizep)
+	size_t *sizep)
 {
 	enum object_type type;
 	struct packed_git *p = all_packs[oe->pack_id];
@@ -1200,7 +1200,7 @@ static void load_tree(struct tree_entry *root)
 	struct object_id *oid = &root->versions[1].oid;
 	struct object_entry *myoe;
 	struct tree_content *t;
-	unsigned long size;
+	size_t size;
 	char *buf;
 	const char *c;
 
@@ -1873,7 +1873,7 @@ static int validate_raw_date(const char *src, struct strbuf *result)
 {
 	const char *orig_src = src;
 	char *endp;
-	unsigned long num;
+	size_t num;
 
 	errno = 0;
 
@@ -2400,7 +2400,7 @@ static void note_change_n(const char *p, struct branch *b, unsigned char *old_fa
 			die("Mark :%" PRIuMAX " not a commit", commit_mark);
 		oidcpy(&commit_oid, &commit_oe->idx.oid);
 	} else if (!get_oid(p, &commit_oid)) {
-		unsigned long size;
+		size_t size;
 		char *buf = read_object_with_reference(&commit_oid,
 						       commit_type, &size,
 						       &commit_oid);
@@ -2453,7 +2453,7 @@ static void file_change_deleteall(struct branch *b)
 	b->num_notes = 0;
 }
 
-static void parse_from_commit(struct branch *b, char *buf, unsigned long size)
+static void parse_from_commit(struct branch *b, char *buf, size_t size)
 {
 	if (!buf || size < GIT_SHA1_HEXSZ + 6)
 		die("Not a valid commit: %s", oid_to_hex(&b->oid));
@@ -2470,7 +2470,7 @@ static void parse_from_existing(struct branch *b)
 		oidclr(&b->branch_tree.versions[0].oid);
 		oidclr(&b->branch_tree.versions[1].oid);
 	} else {
-		unsigned long size;
+		size_t size;
 		char *buf;
 
 		buf = read_object_with_reference(&b->oid, commit_type, &size,
@@ -2507,7 +2507,7 @@ static int parse_from(struct branch *b)
 		if (!oideq(&b->oid, &oe->idx.oid)) {
 			oidcpy(&b->oid, &oe->idx.oid);
 			if (oe->pack_id != MAX_PACK_ID) {
-				unsigned long size;
+				size_t size;
 				char *buf = gfi_unpack_entry(oe, &size);
 				parse_from_commit(b, buf, size);
 				free(buf);
@@ -2550,7 +2550,7 @@ static struct hash_list *parse_merge(unsigned int *count)
 				die("Mark :%" PRIuMAX " not a commit", idnum);
 			oidcpy(&n->oid, &oe->idx.oid);
 		} else if (!get_oid(from, &n->oid)) {
-			unsigned long size;
+			size_t size;
 			char *buf = read_object_with_reference(&n->oid,
 							       commit_type,
 							       &size, &n->oid);
@@ -2776,7 +2776,7 @@ static void parse_reset_branch(const char *arg)
 		unread_command_buf = 1;
 }
 
-static void cat_blob_write(const char *buf, unsigned long size)
+static void cat_blob_write(const char *buf, size_t size)
 {
 	if (write_in_full(cat_blob_fd, buf, size) < 0)
 		die_errno("Write to frontend failed");
@@ -2785,7 +2785,7 @@ static void cat_blob_write(const char *buf, unsigned long size)
 static void cat_blob(struct object_entry *oe, struct object_id *oid)
 {
 	struct strbuf line = STRBUF_INIT;
-	unsigned long size;
+	size_t size;
 	enum object_type type = 0;
 	char *buf;
 
@@ -2869,7 +2869,7 @@ static void parse_cat_blob(const char *p)
 static struct object_entry *dereference(struct object_entry *oe,
 					struct object_id *oid)
 {
-	unsigned long size;
+	size_t size;
 	char *buf = NULL;
 	if (!oe) {
 		enum object_type type = oid_object_info(the_repository, oid,

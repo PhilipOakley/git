@@ -173,9 +173,9 @@ static void set_default_whitespace_mode(struct apply_state *state)
  * of context lines.
  */
 struct fragment {
-	unsigned long leading, trailing;
-	unsigned long oldpos, oldlines;
-	unsigned long newpos, newlines;
+	size_t leading, trailing;
+	size_t oldpos, oldlines;
+	size_t newpos, newlines;
 	/*
 	 * 'patch' is usually borrowed from buf in apply_patch(),
 	 * but some codepaths store an allocated buffer.
@@ -419,9 +419,9 @@ static int read_patch_file(struct strbuf *sb, int fd)
 	return 0;
 }
 
-static unsigned long linelen(const char *buffer, unsigned long size)
+static size_t linelen(const char *buffer, size_t size)
 {
-	unsigned long len = 0;
+	size_t len = 0;
 	while (size--) {
 		len++;
 		if (*buffer++ == '\n')
@@ -1317,7 +1317,7 @@ static int parse_git_header(struct apply_state *state,
 			    unsigned int size,
 			    struct patch *patch)
 {
-	unsigned long offset;
+	size_t offset;
 
 	/* A git diff has explicit new/delete information, so we don't guess */
 	patch->is_new = 0;
@@ -1387,7 +1387,7 @@ static int parse_git_header(struct apply_state *state,
 	return offset;
 }
 
-static int parse_num(const char *line, unsigned long *p)
+static int parse_num(const char *line, size_t *p)
 {
 	char *ptr;
 
@@ -1398,7 +1398,7 @@ static int parse_num(const char *line, unsigned long *p)
 }
 
 static int parse_range(const char *line, int len, int offset, const char *expect,
-		       unsigned long *p1, unsigned long *p2)
+		       size_t *p1, size_t *p2)
 {
 	int digits, ex;
 
@@ -1513,11 +1513,11 @@ static int parse_fragment_header(const char *line, int len, struct fragment *fra
  */
 static int find_header(struct apply_state *state,
 		       const char *line,
-		       unsigned long size,
+		       size_t size,
 		       int *hdrsize,
 		       struct patch *patch)
 {
-	unsigned long offset, len;
+	size_t offset, len;
 
 	patch->is_toplevel_relative = 0;
 	patch->is_rename = patch->is_copy = 0;
@@ -1525,7 +1525,7 @@ static int find_header(struct apply_state *state,
 	patch->old_mode = patch->new_mode = 0;
 	patch->old_name = patch->new_name = NULL;
 	for (offset = 0; size > 0; offset += len, size -= len, line += len, state->linenr++) {
-		unsigned long nextlen;
+		size_t nextlen;
 
 		len = linelen(line, size);
 		if (!len)
@@ -1663,14 +1663,14 @@ static void check_old_for_crlf(struct patch *patch, const char *line, int len)
  */
 static int parse_fragment(struct apply_state *state,
 			  const char *line,
-			  unsigned long size,
+			  size_t size,
 			  struct patch *patch,
 			  struct fragment *fragment)
 {
 	int added, deleted;
 	int len = linelen(line, size), offset;
-	unsigned long oldlines, newlines;
-	unsigned long leading, trailing;
+	size_t oldlines, newlines;
+	size_t leading, trailing;
 
 	offset = parse_fragment_header(line, len, fragment);
 	if (offset < 0)
@@ -1785,11 +1785,11 @@ static int parse_fragment(struct apply_state *state,
  */
 static int parse_single_patch(struct apply_state *state,
 			      const char *line,
-			      unsigned long size,
+			      size_t size,
 			      struct patch *patch)
 {
-	unsigned long offset = 0;
-	unsigned long oldlines = 0, newlines = 0, context = 0;
+	size_t offset = 0;
+	size_t oldlines = 0, newlines = 0, context = 0;
 	struct fragment **fragp = &patch->fragments;
 
 	while (size > 4 && !memcmp(line, "@@ -", 4)) {
@@ -1860,8 +1860,8 @@ static inline int metadata_changes(struct patch *patch)
 		 patch->old_mode != patch->new_mode);
 }
 
-static char *inflate_it(const void *data, unsigned long size,
-			unsigned long inflated_size)
+static char *inflate_it(const void *data, size_t size,
+			size_t inflated_size)
 {
 	git_zstream stream;
 	void *out;
@@ -1890,7 +1890,7 @@ static char *inflate_it(const void *data, unsigned long size,
  */
 static struct fragment *parse_binary_hunk(struct apply_state *state,
 					  char **buf_p,
-					  unsigned long *sz_p,
+					  size_t *sz_p,
 					  int *status_p,
 					  int *used_p)
 {
@@ -1907,10 +1907,10 @@ static struct fragment *parse_binary_hunk(struct apply_state *state,
 	 * to 1-26 bytes, and 'a'-'z' corresponds to 27-52 bytes.
 	 */
 	int llen, used;
-	unsigned long size = *sz_p;
+	size_t size = *sz_p;
 	char *buffer = *buf_p;
 	int patch_method;
-	unsigned long origlen;
+	size_t origlen;
 	char *data = NULL;
 	int hunk_size = 0;
 	struct fragment *frag;
@@ -2002,7 +2002,7 @@ static struct fragment *parse_binary_hunk(struct apply_state *state,
  */
 static int parse_binary(struct apply_state *state,
 			char *buffer,
-			unsigned long size,
+			size_t size,
 			struct patch *patch)
 {
 	/*
@@ -2119,7 +2119,7 @@ static int use_patch(struct apply_state *state, struct patch *p)
  *   the number of bytes consumed otherwise,
  *     so that the caller can call us again for the next patch.
  */
-static int parse_chunk(struct apply_state *state, char *buffer, unsigned long size, struct patch *patch)
+static int parse_chunk(struct apply_state *state, char *buffer, size_t size, struct patch *patch)
 {
 	int hdrsize, patchsize;
 	int offset = find_header(state, buffer, size, &hdrsize, patch);
@@ -2149,7 +2149,7 @@ static int parse_chunk(struct apply_state *state, char *buffer, unsigned long si
 	if (!patchsize) {
 		static const char git_binary[] = "GIT binary patch\n";
 		int hd = hdrsize + offset;
-		unsigned long llen = linelen(buffer + hd, size - hd);
+		size_t llen = linelen(buffer + hd, size - hd);
 
 		if (llen == sizeof(git_binary) - 1 &&
 		    !memcmp(git_binary, buffer + hd, llen)) {
@@ -2393,7 +2393,7 @@ static void update_pre_post_images(struct image *preimage,
 static int line_by_line_fuzzy_match(struct image *img,
 				    struct image *preimage,
 				    struct image *postimage,
-				    unsigned long current,
+				    size_t current,
 				    int current_lno,
 				    int preimage_limit)
 {
@@ -2462,7 +2462,7 @@ static int match_fragment(struct apply_state *state,
 			  struct image *img,
 			  struct image *preimage,
 			  struct image *postimage,
-			  unsigned long current,
+			  size_t current,
 			  int current_lno,
 			  unsigned ws_rule,
 			  int match_beginning, int match_end)
@@ -2673,7 +2673,7 @@ static int find_pos(struct apply_state *state,
 		    int match_beginning, int match_end)
 {
 	int i;
-	unsigned long backwards, forwards, current;
+	size_t backwards, forwards, current;
 	int backwards_lno, forwards_lno, current_lno;
 
 	/*
@@ -2847,7 +2847,7 @@ static int apply_one_fragment(struct apply_state *state,
 	int new_blank_lines_at_end = 0;
 	int found_new_blank_lines_at_end = 0;
 	int hunk_linenr = frag->linenr;
-	unsigned long leading, trailing;
+	size_t leading, trailing;
 	int pos, applied_pos;
 	struct image preimage;
 	struct image postimage;
@@ -3071,9 +3071,9 @@ static int apply_one_fragment(struct apply_state *state,
 		 */
 		if ((leading != frag->leading ||
 		     trailing != frag->trailing) && state->apply_verbosity > verbosity_silent)
-			fprintf_ln(stderr, _("Context reduced to (%ld/%ld)"
+			fprintf_ln(stderr, _("Context reduced to (%"PRIuMAX"/%"PRIuMAX")"
 					     " to apply fragment at %d"),
-				   leading, trailing, applied_pos+1);
+				   (uintmax_t)leading, (uintmax_t)trailing, applied_pos+1);
 		update_image(state, img, applied_pos, &preimage, &postimage);
 	} else {
 		if (state->apply_verbosity > verbosity_normal)
@@ -3095,7 +3095,7 @@ static int apply_binary_fragment(struct apply_state *state,
 				 struct patch *patch)
 {
 	struct fragment *fragment = patch->fragments;
-	unsigned long len;
+	size_t len;
 	void *dst;
 
 	if (!fragment)
@@ -3185,7 +3185,7 @@ static int apply_binary(struct apply_state *state,
 	if (has_object_file(&oid)) {
 		/* We already have the postimage */
 		enum object_type type;
-		unsigned long size;
+		size_t size;
 		char *result;
 
 		result = read_object_file(&oid, &type, &size);
@@ -3230,7 +3230,7 @@ static int apply_fragments(struct apply_state *state, struct image *img, struct 
 	while (frag) {
 		nth++;
 		if (apply_one_fragment(state, img, frag, inaccurate_eof, ws_rule, nth)) {
-			error(_("patch failed: %s:%ld"), name, frag->oldpos);
+			error(_("patch failed: %s:%"PRIuMAX), name, (uintmax_t)frag->oldpos);
 			if (!state->apply_with_reject)
 				return -1;
 			frag->rejected = 1;
@@ -3247,7 +3247,7 @@ static int read_blob_object(struct strbuf *buf, const struct object_id *oid, uns
 		strbuf_addf(buf, "Subproject commit %s\n", oid_to_hex(oid));
 	} else {
 		enum object_type type;
-		unsigned long sz;
+		size_t sz;
 		char *result;
 
 		result = read_object_file(oid, &type, &sz);
@@ -4276,7 +4276,7 @@ static int add_index_file(struct apply_state *state,
 			  const char *path,
 			  unsigned mode,
 			  void *buf,
-			  unsigned long size)
+			  size_t size)
 {
 	struct stat st;
 	struct cache_entry *ce;
@@ -4330,7 +4330,7 @@ static int add_index_file(struct apply_state *state,
  */
 static int try_create_file(struct apply_state *state, const char *path,
 			   unsigned int mode, const char *buf,
-			   unsigned long size)
+			   size_t size)
 {
 	int fd, res;
 	struct strbuf nbuf = STRBUF_INIT;
@@ -4381,7 +4381,7 @@ static int create_one_file(struct apply_state *state,
 			   char *path,
 			   unsigned mode,
 			   const char *buf,
-			   unsigned long size)
+			   size_t size)
 {
 	int res;
 
@@ -4473,7 +4473,7 @@ static int create_file(struct apply_state *state, struct patch *patch)
 {
 	char *path = patch->new_name;
 	unsigned mode = patch->new_mode;
-	unsigned long size = patch->resultsize;
+	size_t size = patch->resultsize;
 	char *buf = patch->result;
 
 	if (!mode)
