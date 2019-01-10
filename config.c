@@ -1484,6 +1484,12 @@ int git_default_config(const char *var, const char *value, void *cb)
 		return 0;
 	}
 
+	if (starts_with(var, "author."))
+		return git_ident_config(var, value, cb);
+
+	if (starts_with(var, "committer."))
+		return git_ident_config(var, value, cb);
+
 	/* Add other config variables here and to Documentation/config.txt. */
 	return 0;
 }

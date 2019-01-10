@@ -1,3 +1,23 @@
+author.email::
+Your email address to be recorded on the author line of any newly
+created commits.
+If this is not set, we use user.email.
+
+author.name::
+Your full name to be recorded on the author line of any newly
+created commits.
+If this is not set, we use user.name.
+
+committer.email::
+Your email address to be recorded on the committer line of any newly
+created commits.
+If this is not set, we use user.email.
+
+committer.name::
+Your full name to be recorded on the committer line of any newly
+created commits.
+If this is not set, we use user.name.
+
 user.email::
 	Your email address to be recorded in any newly created commits.
 	Can be overridden by the `GIT_AUTHOR_EMAIL`, `GIT_COMMITTER_EMAIL`, and
