@@ -9,7 +9,7 @@ git-multi-pack-index - Write and verify multi-pack-indexes
 SYNOPSIS
 --------
 [verse]
-'git multi-pack-index' [--object-dir=<dir>] <verb>
+'git multi-pack-index' [--object-dir=<dir>] <subcommand>
 
 DESCRIPTION
 -----------
@@ -23,13 +23,29 @@ OPTIONS
 	`<dir>/packs/multi-pack-index` for the current MIDX file, and
 	`<dir>/packs` for the pack-files to index.
 
+The following subcommands are available:
+
 write::
-	When given as the verb, write a new MIDX file to
-	`<dir>/packs/multi-pack-index`.
+	Write a new MIDX file.
 
 verify::
-	When given as the verb, verify the contents of the MIDX file
-	at `<dir>/packs/multi-pack-index`.
+	Verify the contents of the MIDX file.
+
+expire::
+	Delete the pack-files that are tracked 	by the MIDX file, but
+	have no objects referenced by the MIDX. Rewrite the MIDX file
+	afterward to remove all references to these pack-files.
+
+repack::
+	Collect a batch of pack-files whose size are all at most the
+	size given by --batch-size, but whose sizes sum to larger
+	than --batch-size. The batch is selected by greedily adding
+	small pack-files starting with the oldest pack-files that fit
+	the size. Create a new pack-file containing the objects the
+	multi-pack-index indexes into those pack-files, and rewrite
+	the multi-pack-index to contain that pack-file. A later run
+	of 'git multi-pack-index expire' will delete the pack-files
+	that were part of this batch.
 
 
 EXAMPLES
