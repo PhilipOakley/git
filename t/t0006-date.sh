@@ -40,6 +40,16 @@ check_show () {
 	'
 }
 
+check_human_date () {
+	time=$1
+	expect=$2
+	test_expect_success "check date ($format:$time)" '
+		echo "$time -> $expect" >expect &&
+		TZ=${zone:-$TZ} test-tool date show:"$format" "$time" >actual &&
+		grep "$expect" actual
+	'
+}
+
 # arbitrary but sensible time for examples
 TIME='1466000000 +0200'
 check_show iso8601 "$TIME" '2016-06-15 16:13:20 +0200'
@@ -52,6 +62,20 @@ check_show unix "$TIME" '1466000000'
 check_show iso-local "$TIME" '2016-06-15 14:13:20 +0000'
 check_show raw-local "$TIME" '1466000000 +0000'
 check_show unix-local "$TIME" '1466000000'
+check_show human "$TIME" 'Jun 15 2016'
+
+# Subtract some known constant time and look for expected field format
+TODAY_REGEX='5 hours ago'
+THIS_YEAR_REGEX='[A-Z][a-z][a-z] [A-Z][a-z][a-z] [0-9]* [012][0-9]:[0-6][0-9]'
+MORE_THAN_A_YEAR_REGEX='[A-Z][a-z][a-z] [A-Z][a-z][a-z] [0-9]* [0-9][0-9][0-9][0-9]'
+check_human_date "$(($(date +%s)-18000)) +0200" $TODAY_REGEX # 5 hours ago
+check_human_date "$(($(date +%s)-432000)) +0200" $THIS_YEAR_REGEX  # 5 days ago
+check_human_date "$(($(date +%s)-1728000)) +0200" $THIS_YEAR_REGEX # 3 weeks ago
+check_human_date "$(($(date +%s)-13000000)) +0200" $THIS_YEAR_REGEX # 5 months ago
+check_human_date "$(($(date +%s)-31449600)) +0200" $THIS_YEAR_REGEX # 12 months ago
+check_human_date "$(($(date +%s)-37500000)) +0200" $MORE_THAN_A_YEAR_REGEX # 1 year, 2 months ago
+check_human_date "$(($(date +%s)-55188000)) +0200" $MORE_THAN_A_YEAR_REGEX # 1 year, 9 months ago
+check_human_date "$(($(date +%s)-630000000)) +0200" $MORE_THAN_A_YEAR_REGEX # 20 years ago
 
 check_show 'format:%z' "$TIME" '+0200'
 check_show 'format-local:%z' "$TIME" '+0000'
