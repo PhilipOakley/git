@@ -42,6 +42,7 @@ struct replay_opts {
 	int keep_redundant_commits;
 	int verbose;
 	int quiet;
+	int reschedule_failed_exec;
 
 	int mainline;
 
