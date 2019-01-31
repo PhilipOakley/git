@@ -1056,7 +1056,7 @@ size_t unpack_object_header_buffer(const unsigned char *buf,
 	size = c & 15;
 	shift = 4;
 	while (c & 0x80) {
-		if (len <= used || bitsizeof(long) <= shift) {
+		if (len <= used) {
 			error("bad object header");
 			size = used = 0;
 			break;
