@@ -3246,7 +3246,8 @@ static unsigned char *deflate_it(char *data,
 				 unsigned long size,
 				 unsigned long *result_size)
 {
-	int bound;
+	// FIXME
+	size_t bound;
 	unsigned char *deflated;
 	git_zstream stream;
 

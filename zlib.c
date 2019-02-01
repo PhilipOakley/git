@@ -148,7 +148,7 @@ int git_inflate(git_zstream *strm, int flush)
 
 unsigned long git_deflate_bound(git_zstream *strm, unsigned long size)
 {
-	return deflateBound(&strm->z, size);
+	return deflateBound(&strm->z, ulong_t(size));
 }
 
 void git_deflate_init(git_zstream *strm, int level)
