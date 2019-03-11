@@ -140,6 +140,11 @@ int git_inflate(git_zstream *strm, int flush)
 #define deflateBound(c,s)  ((s) + (((s) + 7) >> 3) + (((s) + 63) >> 6) + 11)
 #endif
 
+
+/*
+ * The zlib deflateBound() 'size' is uLong. Define NO_DEFLATE_BOUND on
+ * Windows where uLong is only 32 bits and would result in data loss.
+ */
 size_t git_deflate_bound(git_zstream *strm, size_t size)
 {
 	return deflateBound(&strm->z, size);
