@@ -424,6 +424,8 @@ ifeq ($(uname_S),Windows)
 	NO_POSIX_GOODIES = UnfortunatelyYes
 	NATIVE_CRLF = YesPlease
 	DEFAULT_HELP_FORMAT = html
+	NO_DEFLATE_BOUND = YesPlease
+	# the zlib.c deflateBound, compiled for windows, is limited to uLong 32bit sourceLen.
 
 	CC = compat/vcbuild/scripts/clink.pl
 	AR = compat/vcbuild/scripts/lib.pl
