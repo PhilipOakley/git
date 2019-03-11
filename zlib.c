@@ -31,7 +31,7 @@ static const char *zerr_to_string(int status)
 #define ZLIB_BUF_MAX ((uInt) 1024 * 1024 * 1024) /* 1GB */
 static inline uInt zlib_buf_cap(size_t len)
 {
-	return (ZLIB_BUF_MAX < len) ? ZLIB_BUF_MAX : len;
+	return ((size_t) ZLIB_BUF_MAX < len) ? ZLIB_BUF_MAX : (uInt) len;
 }
 
 static void zlib_pre_call(git_zstream *s)
@@ -116,7 +116,7 @@ int git_inflate(git_zstream *strm, int flush)
 		zlib_pre_call(strm);
 		/* Never say Z_FINISH unless we are feeding everything */
 		status = inflate(&strm->z,
-				 (strm->z.avail_in != strm->avail_in)
+				 ((size_t) strm->z.avail_in != strm->avail_in)
 				 ? 0 : flush);
 		if (status == Z_MEM_ERROR)
 			die("inflate: out of memory");
@@ -242,7 +242,7 @@ int git_deflate(git_zstream *strm, int flush)
 
 		/* Never say Z_FINISH unless we are feeding everything */
 		status = deflate(&strm->z,
-				 (strm->z.avail_in != strm->avail_in)
+				 ((size_t) strm->z.avail_in != strm->avail_in)
 				 ? 0 : flush);
 		if (status == Z_MEM_ERROR)
 			die("deflate: out of memory");
