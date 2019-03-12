@@ -38,30 +38,20 @@ static void zlib_pre_call(git_zstream *s)
 {
 	s->z.next_in = s->next_in;
 	s->z.next_out = s->next_out;
-	s->z.total_in = s->total_in;
-	s->z.total_out = s->total_out;
+	s->z.total_in = 0;
+	s->z.total_out = 0;
 	s->z.avail_in = zlib_buf_cap(s->avail_in);
 	s->z.avail_out = zlib_buf_cap(s->avail_out);
 }
 
 static void zlib_post_call(git_zstream *s)
 {
-	size_t bytes_consumed;
-	size_t bytes_produced;
-
-	bytes_consumed = s->z.next_in - s->next_in;
-	bytes_produced = s->z.next_out - s->next_out;
-	if (s->z.total_out != s->total_out + bytes_produced)
-		BUG("total_out mismatch");
-	if (s->z.total_in != s->total_in + bytes_consumed)
-		BUG("total_in mismatch");
-
-	s->total_out = s->z.total_out;
-	s->total_in = s->z.total_in;
+	s->total_out += (size_t) s->z.total_out;
+	s->total_in += (size_t) s->z.total_in;
 	s->next_in = s->z.next_in;
 	s->next_out = s->z.next_out;
-	s->avail_in -= bytes_consumed;
-	s->avail_out -= bytes_produced;
+	s->avail_in -= (size_t) s->z.total_in;
+	s->avail_out -= (size_t) s->z.total_out;
 }
 
 void git_inflate_init(git_zstream *strm)
