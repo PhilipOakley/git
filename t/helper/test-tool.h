@@ -62,6 +62,7 @@ int cmd__wildmatch(int argc, const char **argv);
 int cmd__windows_named_pipe(int argc, const char **argv);
 #endif
 int cmd__write_cache(int argc, const char **argv);
+int cmd__zlib_compile_flags(int argc, const char **argv);
 
 int cmd_hash_impl(int ac, const char **av, int algo);
 
