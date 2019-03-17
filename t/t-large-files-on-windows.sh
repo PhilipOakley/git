@@ -5,6 +5,7 @@ test_description='test large file handling on windows'
 
 test_expect_success EXPENSIVE,SIZE_T_IS_64BIT 'blah blubb' '
 
+	test-tool zlib-compile-flags >zlibFlags.txt &&
 	dd if=/dev/zero of=file bs=1M count=4100 &&
 	git config core.compression 0 &&
 	git config core.looseCompression 0 &&
