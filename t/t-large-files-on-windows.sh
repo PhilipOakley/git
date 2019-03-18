@@ -6,13 +6,15 @@ test_description='test large file handling on windows'
 test_expect_success SIZE_T_IS_64BIT 'blah blubb' '
 
 	test-tool zlib-compile-flags >zlibFlags.txt &&
-	dd if=/dev/zero of=file bs=1M count=4 &&
+	dd if=/dev/zero of=file bs=1M count=5100 &&
 	git config core.compression 0 &&
 	git config core.looseCompression 0 &&
 	git add file &&
 	git fsck --verbose --strict --full &&
 	git commit -m msg file &&
 	git log --stat &&
+	git fsck --verbose --strict --full &&
+	git gc &&
 	git fsck --verbose --strict --full &&
 	git index-pack --verify .git/objects/pack/*.pack &&
 	git gc
