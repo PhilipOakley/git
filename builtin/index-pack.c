@@ -435,12 +435,12 @@ static void *unpack_entry_data(off_t offset, size_t size,
 	if (type == OBJ_BLOB && size > big_file_threshold)
 		buf = fixed_buf;
 	else
-		buf = xmallocz(size);
+		buf = xmallocz(zlib_buf_cap(size));
 
 	memset(&stream, 0, sizeof(stream));
 	git_inflate_init(&stream);
 	stream.next_out = buf;
-	stream.avail_out = buf == fixed_buf ? sizeof(fixed_buf) : size;
+	stream.avail_out = buf == fixed_buf ? sizeof(fixed_buf) : zlib_buf_cap(size);
 
 	do {
 		unsigned char *last_out = stream.next_out;
