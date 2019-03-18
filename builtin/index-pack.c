@@ -462,8 +462,12 @@ static void *unpack_entry_data(off_t offset, size_t size,
 			stream.avail_out = sizeof(fixed_buf);
 		}
 	} while (status == Z_OK);
-	if (stream.total_out != size || status != Z_STREAM_END)
-		bad_object(offset, _("inflate returned %d"), status);
+	if (stream.total_out != size)
+		// BUGS OUT HERE
+		bad_object(offset, _("stream.total_out != size: inflate returned %d"), status);
+	if (status != Z_STREAM_END)
+		// BUGS OUT HERE
+		bad_object(offset, _("status != Z_STREAM_END: inflate returned %d"), status);
 	git_inflate_end(&stream);
 	if (oid)
 		the_hash_algo->final_fn(oid->hash, &c);
