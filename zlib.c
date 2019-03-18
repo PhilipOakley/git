@@ -29,7 +29,7 @@ static const char *zerr_to_string(int status)
  */
 /* #define ZLIB_BUF_MAX ((uInt)-1) */
 #define ZLIB_BUF_MAX ((uInt) 1 * 1024 * 1024) /* 1MB - for testing chunking code */
-static inline uInt zlib_buf_cap(size_t len)
+inline uInt zlib_buf_cap(size_t len)
 {
 	return ((size_t) ZLIB_BUF_MAX < len) ? ZLIB_BUF_MAX : (uInt) len;
 }
