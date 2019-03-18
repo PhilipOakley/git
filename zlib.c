@@ -28,7 +28,7 @@ static const char *zerr_to_string(int status)
  * with zlib in a single call to inflate/deflate.
  */
 /* #define ZLIB_BUF_MAX ((uInt)-1) */
-#define ZLIB_BUF_MAX ((uInt) 1024 * 1024 * 1024) /* 1GB */
+#define ZLIB_BUF_MAX ((uInt) 1 * 1024 * 1024) /* 1MB - for testing chunking code */
 static inline uInt zlib_buf_cap(size_t len)
 {
 	return (ZLIB_BUF_MAX < len) ? ZLIB_BUF_MAX : len;
