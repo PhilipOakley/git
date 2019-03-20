@@ -16,7 +16,7 @@ test_expect_success SIZE_T_IS_64BIT 'blah blubb' '
 	git fsck --verbose --strict --full &&
 	git gc &&
 	git fsck --verbose --strict --full &&
-	git index-pack --verify .git/objects/pack/*.pack &&
+	git index-pack -v .git/objects/pack/*.pack &&
 	git gc
 '
 
