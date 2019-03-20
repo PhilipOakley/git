@@ -10,13 +10,15 @@ test_expect_success SIZE_T_IS_64BIT 'blah blubb' '
 	git config core.compression 0 &&
 	git config core.looseCompression 0 &&
 	git add file &&
+	git verify-pack -s .git/objects/pack/*.pack &&
 	git fsck --verbose --strict --full &&
 	git commit -m msg file &&
+	git verify-pack -s .git/objects/pack/*.pack &&
 	git log --stat &&
 	git fsck --verbose --strict --full &&
-	git gc &&
-	git fsck --verbose --strict --full &&
-	git index-pack -v .git/objects/pack/*.pack &&
+	git repack -a -f &&
+	git verify-pack -s .git/objects/pack/*.pack &&
+	git verify-pack -v .git/objects/pack/*.pack &&
 	git gc
 '
 
