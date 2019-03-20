@@ -250,8 +250,8 @@ static void *fill(size_t min)
 	if (min <= input_len)
 		return input_buffer + input_offset;
 	if (min > sizeof(input_buffer))
-		die(Q_("cannot fill %PRIuMAX byte",
-		       "cannot fill %d bytes",
+		die(Q_("cannot fill %"PRIuMAX" byte",
+		       "cannot fill %"PRIuMAX" bytes",
 		       (uintmax_t) min),
 		    (uintmax_t) min);
 	flush();
