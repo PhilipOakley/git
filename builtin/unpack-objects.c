@@ -79,7 +79,7 @@ static void *fill(int min)
 	return buffer;
 }
 
-static void use(int bytes)
+static void use(size_t bytes)
 {
 	if (bytes > len)
 		die("used more bytes than were available");

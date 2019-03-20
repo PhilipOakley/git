@@ -85,9 +85,13 @@ static int check_self_contained_and_connected;
 
 static struct progress *progress;
 
-/* We always read in 4kB chunks. */
+/* We always read in 4kB chunks,
+ * except blob_obj > big_file_threshold (i.e. when not packed, but just a large raw blob)
+ * or data > ZLIB_BUF_MAX.
+*/
 static unsigned char input_buffer[4096];
-static unsigned int input_offset, input_len;
+static size_t input_offset;
+static size_t input_len;
 static off_t consumed_bytes;
 static off_t max_input_size;
 static unsigned deepest_delta;
@@ -241,15 +245,15 @@ static void flush(void)
  * Make sure at least "min" bytes are available in the buffer, and
  * return the pointer to the buffer.
  */
-static void *fill(int min)
+static void *fill(size_t min)
 {
 	if (min <= input_len)
 		return input_buffer + input_offset;
 	if (min > sizeof(input_buffer))
-		die(Q_("cannot fill %d byte",
+		die(Q_("cannot fill %PRIuMAX byte",
 		       "cannot fill %d bytes",
-		       min),
-		    min);
+		       (uintmax_t) min),
+		    (uintmax_t) min);
 	flush();
 	do {
 		ssize_t ret = xread(input_fd, input_buffer + input_len,
@@ -266,13 +270,20 @@ static void *fill(int min)
 	return input_buffer;
 }
 
-static void use(int bytes)
+static void use(size_t bytes)
 {
+	size_t bytes_rem;
 	if (bytes > input_len)
 		die(_("used more bytes than were available"));
-	input_crc32 = crc32(input_crc32, input_buffer + input_offset, bytes);
-	input_len -= bytes;
-	input_offset += bytes;
+	bytes_rem = bytes;
+
+	while (bytes_rem > INTMAX_MAX) {
+		int crc_bytes = (bytes_rem > INTMAX_MAX) ? INTMAX_MAX : bytes_rem;
+		input_crc32 = crc32(input_crc32, input_buffer + input_offset, crc_bytes);
+		input_len -= crc_bytes;
+		input_offset += crc_bytes;
+		bytes_rem -= crc_bytes;
+	}
 
 	/* make sure off_t is sufficiently large not to wrap */
 	if (signed_add_overflows(consumed_bytes, bytes))
@@ -435,7 +446,7 @@ static void *unpack_entry_data(off_t offset, size_t size,
 	if (type == OBJ_BLOB && size > big_file_threshold)
 		buf = fixed_buf;
 	else
-		buf = xmallocz(zlib_buf_cap(size));
+		buf = xmallocz(size);
 
 	memset(&stream, 0, sizeof(stream));
 	git_inflate_init(&stream);
@@ -443,9 +454,12 @@ static void *unpack_entry_data(off_t offset, size_t size,
 	stream.avail_out = buf == fixed_buf ? sizeof(fixed_buf) : zlib_buf_cap(size);
 
 	do {
+		
 		unsigned char *last_out = stream.next_out;
 		stream.next_in = fill(1);
 		stream.avail_in = input_len;
+		
+		
 		status = git_inflate(&stream, 0);
 		use(input_len - stream.avail_in);
 		if (oid)
@@ -454,9 +468,13 @@ static void *unpack_entry_data(off_t offset, size_t size,
 			stream.next_out = buf;
 			stream.avail_out = sizeof(fixed_buf);
 		}
+		else {
+			stream.avail_out = zlib_buf_cap(size - stream.total_out);
+		}
 	} while (status == Z_OK);
 	if (stream.total_out != size)
 		// BUGS OUT HERE
+		printf("stream.total_out %zu != size %zu \n",  stream.total_out, size);
 		bad_object(offset, _("stream.total_out != size: inflate returned %d"), status);
 	if (status != Z_STREAM_END)
 		// BUGS OUT HERE
