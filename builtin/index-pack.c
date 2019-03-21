@@ -444,7 +444,7 @@ static void *unpack_entry_data(off_t offset, size_t size,
 	memset(&stream, 0, sizeof(stream));
 	git_inflate_init(&stream);
 	stream.next_out = buf;
-	stream.avail_out = buf == fixed_buf ? sizeof(fixed_buf) : zlib_buf_cap(size);
+	stream.avail_out = buf == fixed_buf ? sizeof(fixed_buf) : size;
 
 	do {
 		
@@ -467,7 +467,9 @@ static void *unpack_entry_data(off_t offset, size_t size,
 	} while (status == Z_OK);
 	if (stream.total_out != size)
 		// BUGS OUT HERE
-		printf("stream.total_out %zu != size %zu \n",  stream.total_out, size);
+		fprintf(stderr,"stream.total_out %"PRIuMAX" != size %"PRIuMAX" \n",  stream.total_out, size);
+		printf("***\n");
+		fflush(stdout);
 		bad_object(offset, _("stream.total_out != size: inflate returned %d"), status);
 	if (status != Z_STREAM_END)
 		// BUGS OUT HERE
@@ -484,10 +486,10 @@ static void *unpack_raw_entry(struct object_entry *obj,
 			      struct object_id *oid)
 {
 	unsigned char *p;
-	unsigned long c;
+	size_t c;
 	size_t size;
 	off_t base_offset;
-	unsigned shift;
+	size_t shift;
 	void *data;
 
 	obj->idx.offset = consumed_bytes;
