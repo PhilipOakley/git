@@ -482,7 +482,7 @@ static void *unpack_raw_entry(struct object_entry *obj,
 	unsigned char *p;
 	size_t size, c;
 	off_t base_offset;
-	unsigned shift;
+	size_t shift;
 	void *data;
 
 	obj->idx.offset = consumed_bytes;
@@ -1618,10 +1618,10 @@ static void read_idx_option(struct pack_idx_option *opts, const char *pack_name)
 static void show_pack_info(int stat_only)
 {
 	int i, baseobjects = nr_objects - nr_ref_deltas - nr_ofs_deltas;
-	unsigned long *chain_histogram = NULL;
+	size_t *chain_histogram = NULL;
 
 	if (deepest_delta)
-		chain_histogram = xcalloc(deepest_delta, sizeof(unsigned long));
+		chain_histogram = xcalloc(deepest_delta, sizeof(size_t));
 
 	for (i = 0; i < nr_objects; i++) {
 		struct object_entry *obj = &objects[i];
@@ -1651,11 +1651,11 @@ static void show_pack_info(int stat_only)
 	for (i = 0; i < deepest_delta; i++) {
 		if (!chain_histogram[i])
 			continue;
-		printf_ln(Q_("chain length = %d: %lu object",
-			     "chain length = %d: %lu objects",
+		printf_ln(Q_("chain length = %d: %"PRIuMAX" object",
+			     "chain length = %d: %"PRIuMAX" objects",
 			     chain_histogram[i]),
 			  i + 1,
-			  chain_histogram[i]);
+			  (uintmax_t)chain_histogram[i]);
 	}
 }
 
