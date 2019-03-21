@@ -95,7 +95,7 @@ void hashwrite(struct hashfile *f, const void *buf, unsigned int count)
 		const void *data;
 
 		if (f->do_crc)
-			f->crc32 = crc32(f->crc32, buf, nr);
+			f->crc32 = xcrc32(f->crc32, buf, nr);
 
 		if (nr == sizeof(f->buffer)) {
 			/* process full buffer directly without copy */

@@ -279,7 +279,7 @@ static void use(int bytes)
 {
 	if (bytes > input_len)
 		die(_("used more bytes than were available"));
-	input_crc32 = crc32(input_crc32, input_buffer + input_offset, bytes);
+	input_crc32 = xcrc32(input_crc32, input_buffer + input_offset, bytes);
 	input_len -= bytes;
 	input_offset += bytes;
 
