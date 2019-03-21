@@ -1866,4 +1866,10 @@ int print_sha1_ellipsis(void);
 /* Return 1 if the file is empty or does not exists, 0 otherwise. */
 int is_empty_or_missing_file(const char *filename);
 
+/*
+ * Extended crc32 with 64 bit address range
+ * On Windows, uInt/uLong are only 32 bits.
+ */
+extern uLong xcrc32(uLong crc, const unsigned char *buf, size_t bytes);
+
 #endif /* CACHE_H */

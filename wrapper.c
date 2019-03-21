@@ -703,3 +703,19 @@ int is_empty_or_missing_file(const char *filename)
 
 	return !st.st_size;
 }
+
+uLong xcrc32(uLong crc, const unsigned char *buf, size_t bytes)
+{
+	size_t bytes_rem, off;
+	bytes_rem = bytes;
+	off = 0;
+	while (bytes_rem) {
+		int crc_bytes = maximum_signed_value_of_type(int);
+		if (crc_bytes > bytes_rem)
+			crc_bytes = bytes_rem;
+		crc = crc32(crc, buf + off, crc_bytes);
+		off += crc_bytes;
+		bytes_rem -= crc_bytes;
+	}
+	return crc;
+}
