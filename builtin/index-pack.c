@@ -272,18 +272,11 @@ static void *fill(size_t min)
 
 static void use(size_t bytes)
 {
-	size_t bytes_rem;
 	if (bytes > input_len)
 		die(_("used more bytes than were available"));
-	bytes_rem = bytes;
-
-	while (bytes_rem > INTMAX_MAX) {
-		int crc_bytes = (bytes_rem > INTMAX_MAX) ? INTMAX_MAX : bytes_rem;
-		input_crc32 = crc32(input_crc32, input_buffer + input_offset, crc_bytes);
-		input_len -= crc_bytes;
-		input_offset += crc_bytes;
-		bytes_rem -= crc_bytes;
-	}
+	input_crc32 = xcrc32(input_crc32, input_buffer + input_offset, bytes);
+	input_len -= bytes;
+	input_offset += bytes;
 
 	/* make sure off_t is sufficiently large not to wrap */
 	if (signed_add_overflows(consumed_bytes, bytes))
