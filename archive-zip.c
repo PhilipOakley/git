@@ -352,7 +352,7 @@ static int write_zip_entry(struct archiver_args *args,
 			if (!buffer)
 				return error(_("cannot read %s"),
 					     oid_to_hex(oid));
-			crc = crc32(crc, buffer, size);
+			crc = xcrc32(crc, buffer, size);
 			is_binary = entry_is_binary(args->repo->index,
 						    path_without_prefix,
 						    buffer, size);
@@ -428,7 +428,7 @@ static int write_zip_entry(struct archiver_args *args,
 			readlen = read_istream(stream, buf, sizeof(buf));
 			if (readlen <= 0)
 				break;
-			crc = crc32(crc, buf, readlen);
+			crc = xcrc32(crc, buf, readlen);
 			if (is_binary == -1)
 				is_binary = entry_is_binary(args->repo->index,
 							    path_without_prefix,
@@ -461,7 +461,7 @@ static int write_zip_entry(struct archiver_args *args,
 			readlen = read_istream(stream, buf, sizeof(buf));
 			if (readlen <= 0)
 				break;
-			crc = crc32(crc, buf, readlen);
+			crc = xcrc32(crc, buf, readlen);
 			if (is_binary == -1)
 				is_binary = entry_is_binary(args->repo->index,
 							    path_without_prefix,
