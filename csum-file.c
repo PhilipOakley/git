@@ -11,7 +11,7 @@
 #include "progress.h"
 #include "csum-file.h"
 
-static void flush(struct hashfile *f, const void *buf, unsigned int count)
+static void flush(struct hashfile *f, const void *buf, size_t count)
 {
 	if (0 <= f->check_fd && count)  {
 		unsigned char check_buffer[8192];
@@ -44,7 +44,7 @@ static void flush(struct hashfile *f, const void *buf, unsigned int count)
 
 void hashflush(struct hashfile *f)
 {
-	unsigned offset = f->offset;
+	size_t offset = f->offset;
 
 	if (offset) {
 		the_hash_algo->update_fn(&f->ctx, f->buffer, offset);
@@ -86,12 +86,12 @@ int finalize_hashfile(struct hashfile *f, unsigned char *result, unsigned int fl
 	return fd;
 }
 
-void hashwrite(struct hashfile *f, const void *buf, unsigned int count)
+void hashwrite(struct hashfile *f, const void *buf, size_t count)
 {
 	while (count) {
-		unsigned offset = f->offset;
-		unsigned left = sizeof(f->buffer) - offset;
-		unsigned nr = count > left ? left : count;
+		size_t offset = f->offset;
+		size_t left = sizeof(f->buffer) - offset;
+		size_t nr = count > left ? left : count;
 		const void *data;
 
 		if (f->do_crc)
