@@ -1047,7 +1047,7 @@ struct list_head *get_packed_git_mru(struct repository *r)
 size_t unpack_object_header_buffer(const unsigned char *buf,
 		size_t len, enum object_type *type, size_t *sizep)
 {
-	unsigned shift;
+	size_t shift;
 	size_t size, c;
 	size_t used = 0;
 
