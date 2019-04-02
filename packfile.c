@@ -1056,7 +1056,8 @@ unsigned long unpack_object_header_buffer(const unsigned char *buf,
 	size = c & 15;
 	shift = 4;
 	while (c & 0x80) {
-		if (len <= used || bitsizeof(long) <= shift) {
+		if (len <= used) {
+			printf("type %d", type);
 			error("bad object header");
 			size = used = 0;
 			break;
@@ -1300,7 +1301,7 @@ static enum object_type packed_to_object_type(struct repository *r,
 	case OBJ_TAG:
 		break;
 	default:
-		error("unknown object type %i at offset %"PRIuMAX" in %s",
+		error("packed_to_object_type: unknown object type %i at offset %"PRIuMAX" in %s",
 		      type, (uintmax_t)obj_offset, p->pack_name);
 		type = OBJ_BAD;
 	}
