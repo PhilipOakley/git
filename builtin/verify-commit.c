@@ -21,7 +21,7 @@ static const char * const verify_commit_usage[] = {
 		NULL
 };
 
-static int run_gpg_verify(const struct object_id *oid, const char *buf, unsigned long size, unsigned flags)
+static int run_gpg_verify(const struct object_id *oid, const char *buf, size_t size, unsigned flags)
 {
 	struct signature_check signature_check;
 	int ret;
@@ -41,7 +41,7 @@ static int verify_commit(const char *name, unsigned flags)
 	enum object_type type;
 	struct object_id oid;
 	char *buf;
-	unsigned long size;
+	size_t size;
 	int ret;
 
 	if (get_oid(name, &oid))

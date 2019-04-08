@@ -209,7 +209,7 @@ struct grep_source {
 	void *identifier;
 
 	char *buf;
-	unsigned long size;
+	size_t size;
 
 	char *path; /* for attribute lookups */
 	struct userdiff_driver *driver;

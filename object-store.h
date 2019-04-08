@@ -139,7 +139,7 @@ struct raw_object_store {
 	 * These two fields are not meant for direct access. Use
 	 * approximate_object_count() instead.
 	 */
-	unsigned long approximate_object_count;
+	size_t approximate_object_count;
 	unsigned approximate_object_count_valid : 1;
 
 	/*
@@ -160,16 +160,16 @@ const char *loose_object_path(struct repository *r, struct strbuf *buf,
 			      const struct object_id *oid);
 
 void *map_loose_object(struct repository *r, const struct object_id *oid,
-		       unsigned long *size);
+		       size_t *size);
 
 extern void *read_object_file_extended(struct repository *r,
 				       const struct object_id *oid,
 				       enum object_type *type,
-				       unsigned long *size, int lookup_replace);
+				       size_t *size, int lookup_replace);
 static inline void *repo_read_object_file(struct repository *r,
 					  const struct object_id *oid,
 					  enum object_type *type,
-					  unsigned long *size)
+					  size_t *size)
 {
 	return read_object_file_extended(r, oid, type, size, 1);
 }
@@ -178,19 +178,19 @@ static inline void *repo_read_object_file(struct repository *r,
 #endif
 
 /* Read and unpack an object file into memory, write memory to an object file */
-int oid_object_info(struct repository *r, const struct object_id *, unsigned long *);
+int oid_object_info(struct repository *r, const struct object_id *, size_t *);
 
-extern int hash_object_file(const void *buf, unsigned long len,
+extern int hash_object_file(const void *buf, size_t len,
 			    const char *type, struct object_id *oid);
 
-extern int write_object_file(const void *buf, unsigned long len,
+extern int write_object_file(const void *buf, size_t len,
 			     const char *type, struct object_id *oid);
 
-extern int hash_object_file_literally(const void *buf, unsigned long len,
+extern int hash_object_file_literally(const void *buf, size_t len,
 				      const char *type, struct object_id *oid,
 				      unsigned flags);
 
-extern int pretend_object_file(void *, unsigned long, enum object_type,
+extern int pretend_object_file(void *, size_t, enum object_type,
 			       struct object_id *oid);
 
 extern int force_object_loose(const struct object_id *oid, time_t mtime);
@@ -205,7 +205,7 @@ extern int force_object_loose(const struct object_id *oid, time_t mtime);
 int read_loose_object(const char *path,
 		      const struct object_id *expected_oid,
 		      enum object_type *type,
-		      unsigned long *size,
+		      size_t *size,
 		      void **contents);
 
 #ifndef NO_THE_REPOSITORY_COMPATIBILITY_MACROS
@@ -234,7 +234,7 @@ extern void assert_oid_type(const struct object_id *oid, enum object_type expect
 struct object_info {
 	/* Request */
 	enum object_type *typep;
-	unsigned long *sizep;
+	size_t *sizep;
 	off_t *disk_sizep;
 	unsigned char *delta_base_sha1;
 	struct strbuf *type_name;
