@@ -187,7 +187,7 @@ struct object *lookup_unknown_object(const struct object_id *oid)
 	return obj;
 }
 
-struct object *parse_object_buffer(struct repository *r, const struct object_id *oid, enum object_type type, unsigned long size, void *buffer, int *eaten_p)
+struct object *parse_object_buffer(struct repository *r, const struct object_id *oid, enum object_type type, size_t size, void *buffer, int *eaten_p)
 {
 	struct object *obj;
 	*eaten_p = 0;
@@ -249,7 +249,7 @@ struct object *parse_object_or_die(const struct object_id *oid,
 
 struct object *parse_object(struct repository *r, const struct object_id *oid)
 {
-	unsigned long size;
+	size_t size;
 	enum object_type type;
 	int eaten;
 	const struct object_id *repl = lookup_replace_object(r, oid);

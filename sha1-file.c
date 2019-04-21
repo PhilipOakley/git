@@ -208,7 +208,7 @@ static struct cached_object {
 	struct object_id oid;
 	enum object_type type;
 	void *buf;
-	unsigned long size;
+	size_t size;
 } *cached_objects;
 static int cached_object_nr, cached_object_alloc;
 
@@ -977,7 +977,7 @@ void *xmmap(void *start, size_t length,
  * the streaming interface and rehash it to do the same.
  */
 int check_object_signature(const struct object_id *oid, void *map,
-			   unsigned long size, const char *type)
+			   size_t size, const char *type)
 {
 	struct object_id real_oid;
 	enum object_type obj_type;
@@ -1113,7 +1113,7 @@ static int quick_has_loose(struct repository *r,
  * searching for a loose object named "oid".
  */
 static void *map_loose_object_1(struct repository *r, const char *path,
-			     const struct object_id *oid, unsigned long *size)
+			     const struct object_id *oid, size_t *size)
 {
 	void *map;
 	int fd;
@@ -1143,14 +1143,14 @@ static void *map_loose_object_1(struct repository *r, const char *path,
 
 void *map_loose_object(struct repository *r,
 		       const struct object_id *oid,
-		       unsigned long *size)
+		       size_t *size)
 {
 	return map_loose_object_1(r, NULL, oid, size);
 }
 
 static int unpack_loose_short_header(git_zstream *stream,
-				     unsigned char *map, unsigned long mapsize,
-				     void *buffer, unsigned long bufsiz)
+				     unsigned char *map, size_t mapsize,
+				     void *buffer, size_t bufsiz)
 {
 	/* Get the data stream */
 	memset(stream, 0, sizeof(*stream));
@@ -1164,8 +1164,8 @@ static int unpack_loose_short_header(git_zstream *stream,
 }
 
 int unpack_loose_header(git_zstream *stream,
-			unsigned char *map, unsigned long mapsize,
-			void *buffer, unsigned long bufsiz)
+			unsigned char *map, size_t mapsize,
+			void *buffer, size_t bufsiz)
 {
 	int status = unpack_loose_short_header(stream, map, mapsize,
 					       buffer, bufsiz);
@@ -1180,8 +1180,8 @@ int unpack_loose_header(git_zstream *stream,
 }
 
 static int unpack_loose_header_to_strbuf(git_zstream *stream, unsigned char *map,
-					 unsigned long mapsize, void *buffer,
-					 unsigned long bufsiz, struct strbuf *header)
+					 size_t mapsize, void *buffer,
+					 size_t bufsiz, struct strbuf *header)
 {
 	int status;
 
@@ -1216,12 +1216,12 @@ static int unpack_loose_header_to_strbuf(git_zstream *stream, unsigned char *map
 }
 
 static void *unpack_loose_rest(git_zstream *stream,
-			       void *buffer, unsigned long size,
+			       void *buffer, size_t size,
 			       const struct object_id *oid)
 {
 	int bytes = strlen(buffer) + 1;
 	unsigned char *buf = xmallocz(size);
-	unsigned long n;
+	size_t n;
 	int status = Z_OK;
 
 	n = stream->total_out - bytes;
@@ -1271,7 +1271,7 @@ static int parse_loose_header_extended(const char *hdr, struct object_info *oi,
 				       unsigned int flags)
 {
 	const char *type_buf = hdr;
-	unsigned long size;
+	size_t size;
 	int type, type_len = 0;
 
 	/*
@@ -1311,7 +1311,7 @@ static int parse_loose_header_extended(const char *hdr, struct object_info *oi,
 		return -1;
 	if (size) {
 		for (;;) {
-			unsigned long c = *hdr - '0';
+			size_t c = *hdr - '0';
 			if (c > 9)
 				break;
 			hdr++;
@@ -1328,7 +1328,7 @@ static int parse_loose_header_extended(const char *hdr, struct object_info *oi,
 	return *hdr ? -1 : type;
 }
 
-int parse_loose_header(const char *hdr, unsigned long *sizep)
+int parse_loose_header(const char *hdr, size_t *sizep)
 {
 	struct object_info oi = OBJECT_INFO_INIT;
 
@@ -1341,12 +1341,12 @@ static int loose_object_info(struct repository *r,
 			     struct object_info *oi, int flags)
 {
 	int status = 0;
-	unsigned long mapsize;
+	size_t mapsize;
 	void *map;
 	git_zstream stream;
 	char hdr[MAX_HEADER_LEN];
 	struct strbuf hdrbuf = STRBUF_INIT;
-	unsigned long size_scratch;
+	size_t size_scratch;
 
 	if (oi->delta_base_sha1)
 		hashclr(oi->delta_base_sha1);
@@ -1515,7 +1515,7 @@ int oid_object_info_extended(struct repository *r, const struct object_id *oid,
 /* returns enum object_type or negative */
 int oid_object_info(struct repository *r,
 		    const struct object_id *oid,
-		    unsigned long *sizep)
+		    size_t *sizep)
 {
 	enum object_type type;
 	struct object_info oi = OBJECT_INFO_INIT;
@@ -1530,7 +1530,7 @@ int oid_object_info(struct repository *r,
 
 static void *read_object(struct repository *r,
 			 const struct object_id *oid, enum object_type *type,
-			 unsigned long *size)
+			 size_t *size)
 {
 	struct object_info oi = OBJECT_INFO_INIT;
 	void *content;
@@ -1543,7 +1543,7 @@ static void *read_object(struct repository *r,
 	return content;
 }
 
-int pretend_object_file(void *buf, unsigned long len, enum object_type type,
+int pretend_object_file(void *buf, size_t len, enum object_type type,
 			struct object_id *oid)
 {
 	struct cached_object *co;
@@ -1569,7 +1569,7 @@ int pretend_object_file(void *buf, unsigned long len, enum object_type type,
 void *read_object_file_extended(struct repository *r,
 				const struct object_id *oid,
 				enum object_type *type,
-				unsigned long *size,
+				size_t *size,
 				int lookup_replace)
 {
 	void *data;
@@ -1606,12 +1606,12 @@ void *read_object_file_extended(struct repository *r,
 void *read_object_with_reference(struct repository *r,
 				 const struct object_id *oid,
 				 const char *required_type_name,
-				 unsigned long *size,
+				 size_t *size,
 				 struct object_id *actual_oid_return)
 {
 	enum object_type type, required_type;
 	void *buffer;
-	unsigned long isize;
+	size_t isize;
 	struct object_id actual_oid;
 
 	required_type = type_from_string(required_type_name);
@@ -1652,7 +1652,7 @@ void *read_object_with_reference(struct repository *r,
 	}
 }
 
-static void write_object_file_prepare(const void *buf, unsigned long len,
+static void write_object_file_prepare(const void *buf, size_t len,
 				      const char *type, struct object_id *oid,
 				      char *hdr, int *hdrlen)
 {
@@ -1718,7 +1718,7 @@ static int write_buffer(int fd, const void *buf, size_t len)
 	return 0;
 }
 
-int hash_object_file(const void *buf, unsigned long len, const char *type,
+int hash_object_file(const void *buf, size_t len, const char *type,
 		     struct object_id *oid)
 {
 	char hdr[MAX_HEADER_LEN];
@@ -1782,7 +1782,7 @@ static int create_tmpfile(struct strbuf *tmp, const char *filename)
 }
 
 static int write_loose_object(const struct object_id *oid, char *hdr,
-			      int hdrlen, const void *buf, unsigned long len,
+			      int hdrlen, const void *buf, size_t len,
 			      time_t mtime)
 {
 	int fd, ret;
@@ -1872,7 +1872,7 @@ static int freshen_packed_object(const struct object_id *oid)
 	return 1;
 }
 
-int write_object_file(const void *buf, unsigned long len, const char *type,
+int write_object_file(const void *buf, size_t len, const char *type,
 		      struct object_id *oid)
 {
 	char hdr[MAX_HEADER_LEN];
@@ -1887,7 +1887,7 @@ int write_object_file(const void *buf, unsigned long len, const char *type,
 	return write_loose_object(oid, hdr, hdrlen, buf, len, 0);
 }
 
-int hash_object_file_literally(const void *buf, unsigned long len,
+int hash_object_file_literally(const void *buf, size_t len,
 			       const char *type, struct object_id *oid,
 			       unsigned flags)
 {
@@ -1913,7 +1913,7 @@ cleanup:
 int force_object_loose(const struct object_id *oid, time_t mtime)
 {
 	void *buf;
-	unsigned long len;
+	size_t len;
 	enum object_type type;
 	char hdr[MAX_HEADER_LEN];
 	int hdrlen;
@@ -2356,14 +2356,14 @@ void odb_clear_loose_cache(struct object_directory *odb)
 
 static int check_stream_oid(git_zstream *stream,
 			    const char *hdr,
-			    unsigned long size,
+			    size_t size,
 			    const char *path,
 			    const struct object_id *expected_oid)
 {
 	git_hash_ctx c;
 	struct object_id real_oid;
 	unsigned char buf[4096];
-	unsigned long total_read;
+	size_t total_read;
 	int status = Z_OK;
 
 	the_hash_algo->init_fn(&c);
@@ -2415,12 +2415,12 @@ static int check_stream_oid(git_zstream *stream,
 int read_loose_object(const char *path,
 		      const struct object_id *expected_oid,
 		      enum object_type *type,
-		      unsigned long *size,
+		      size_t *size,
 		      void **contents)
 {
 	int ret = -1;
 	void *map = NULL;
-	unsigned long mapsize;
+	size_t mapsize;
 	git_zstream stream;
 	char hdr[MAX_HEADER_LEN];
 
