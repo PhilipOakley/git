@@ -297,7 +297,7 @@ static void check_notes_merge_worktree(struct notes_merge_options *o)
 }
 
 static void write_buf_to_worktree(const struct object_id *obj,
-				  const char *buf, unsigned long size)
+				  const char *buf, size_t size)
 {
 	int fd;
 	char *path = git_pathdup(NOTES_MERGE_WORKTREE "/%s", oid_to_hex(obj));
@@ -326,7 +326,7 @@ static void write_note_to_worktree(const struct object_id *obj,
 				   const struct object_id *note)
 {
 	enum object_type type;
-	unsigned long size;
+	size_t size;
 	void *buf = read_object_file(note, &type, &size);
 
 	if (!buf)

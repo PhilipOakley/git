@@ -228,7 +228,7 @@ static int ce_compare_link(const struct cache_entry *ce, size_t expected_size)
 {
 	int match = -1;
 	void *buffer;
-	unsigned long size;
+	size_t size;
 	enum object_type type;
 	struct strbuf sb = STRBUF_INIT;
 
@@ -1671,7 +1671,7 @@ int verify_index_checksum;
 /* Allow fsck to force verification of the cache entry order. */
 int verify_ce_order;
 
-static int verify_hdr(const struct cache_header *hdr, unsigned long size)
+static int verify_hdr(const struct cache_header *hdr, size_t size)
 {
 	git_hash_ctx c;
 	unsigned char hash[GIT_MAX_RAWSZ];
@@ -1695,7 +1695,7 @@ static int verify_hdr(const struct cache_header *hdr, unsigned long size)
 }
 
 static int read_index_extension(struct index_state *istate,
-				const char *ext, const char *data, unsigned long sz)
+				const char *ext, const char *data, size_t sz)
 {
 	switch (CACHE_EXT(ext)) {
 	case CACHE_EXT_TREE:
@@ -1731,7 +1731,7 @@ static int read_index_extension(struct index_state *istate,
 static struct cache_entry *create_from_disk(struct mem_pool *ce_mem_pool,
 					    unsigned int version,
 					    struct ondisk_cache_entry *ondisk,
-					    unsigned long *ent_size,
+					    size_t *ent_size,
 					    const struct cache_entry *previous_ce)
 {
 	struct cache_entry *ce;
@@ -1924,13 +1924,13 @@ struct load_index_extensions
 	struct index_state *istate;
 	const char *mmap;
 	size_t mmap_size;
-	unsigned long src_offset;
+	size_t src_offset;
 };
 
 static void *load_index_extensions(void *_data)
 {
 	struct load_index_extensions *p = _data;
-	unsigned long src_offset = p->src_offset;
+	size_t src_offset = p->src_offset;
 
 	while (src_offset <= p->mmap_size - the_hash_algo->rawsz - 8) {
 		/* After an array of active_nr index entries,
@@ -1958,17 +1958,17 @@ static void *load_index_extensions(void *_data)
  * A helper function that will load the specified range of cache entries
  * from the memory mapped file and add them to the given index.
  */
-static unsigned long load_cache_entry_block(struct index_state *istate,
+static size_t load_cache_entry_block(struct index_state *istate,
 			struct mem_pool *ce_mem_pool, int offset, int nr, const char *mmap,
-			unsigned long start_offset, const struct cache_entry *previous_ce)
+			size_t start_offset, const struct cache_entry *previous_ce)
 {
 	int i;
-	unsigned long src_offset = start_offset;
+	size_t src_offset = start_offset;
 
 	for (i = offset; i < offset + nr; i++) {
 		struct ondisk_cache_entry *disk_ce;
 		struct cache_entry *ce;
-		unsigned long consumed;
+		size_t consumed;
 
 		disk_ce = (struct ondisk_cache_entry *)(mmap + src_offset);
 		ce = create_from_disk(ce_mem_pool, istate->version, disk_ce, &consumed, previous_ce);
@@ -1980,10 +1980,10 @@ static unsigned long load_cache_entry_block(struct index_state *istate,
 	return src_offset - start_offset;
 }
 
-static unsigned long load_all_cache_entries(struct index_state *istate,
-			const char *mmap, size_t mmap_size, unsigned long src_offset)
+static size_t load_all_cache_entries(struct index_state *istate,
+			const char *mmap, size_t mmap_size, size_t src_offset)
 {
-	unsigned long consumed;
+	size_t consumed;
 
 	if (istate->version == 4) {
 		mem_pool_init(&istate->ce_mem_pool,
@@ -2017,7 +2017,7 @@ struct load_cache_entries_thread_data
 	struct index_entry_offset_table *ieot;
 	int ieot_start;		/* starting index into the ieot array */
 	int ieot_blocks;	/* count of ieot entries to process */
-	unsigned long consumed;	/* return # of bytes in index file processed */
+	size_t consumed;	/* return # of bytes in index file processed */
 };
 
 /*
@@ -2038,12 +2038,12 @@ static void *load_cache_entries_thread(void *_data)
 	return NULL;
 }
 
-static unsigned long load_cache_entries_threaded(struct index_state *istate, const char *mmap, size_t mmap_size,
+static size_t load_cache_entries_threaded(struct index_state *istate, const char *mmap, size_t mmap_size,
 						 int nr_threads, struct index_entry_offset_table *ieot)
 {
 	int i, offset, ieot_blocks, ieot_start, err;
 	struct load_cache_entries_thread_data *data;
-	unsigned long consumed = 0;
+	size_t consumed = 0;
 
 	/* a little sanity checking */
 	if (istate->name_hash_initialized)
@@ -2114,7 +2114,7 @@ int do_read_index(struct index_state *istate, const char *path, int must_exist)
 {
 	int fd;
 	struct stat st;
-	unsigned long src_offset;
+	size_t src_offset;
 	const struct cache_header *hdr;
 	const char *mmap;
 	size_t mmap_size;
@@ -2423,7 +2423,7 @@ int repo_index_has_changes(struct repository *repo,
 
 #define WRITE_BUFFER_SIZE 8192
 static unsigned char write_buffer[WRITE_BUFFER_SIZE];
-static unsigned long write_buffer_len;
+static size_t write_buffer_len;
 
 static int ce_write_flush(git_hash_ctx *context, int fd)
 {
@@ -3066,9 +3066,9 @@ static int write_split_index(struct index_state *istate,
 
 static const char *shared_index_expire = "2.weeks.ago";
 
-static unsigned long get_shared_index_expire_date(void)
+static size_t get_shared_index_expire_date(void)
 {
-	static unsigned long shared_index_expire_date;
+	static size_t shared_index_expire_date;
 	static int shared_index_expire_date_prepared;
 
 	if (!shared_index_expire_date_prepared) {
@@ -3084,7 +3084,7 @@ static unsigned long get_shared_index_expire_date(void)
 static int should_delete_shared_index(const char *shared_index_path)
 {
 	struct stat st;
-	unsigned long expiration;
+	size_t expiration;
 
 	/* Check timestamp */
 	expiration = get_shared_index_expire_date();
@@ -3325,10 +3325,10 @@ int index_name_is_other(const struct index_state *istate, const char *name,
 }
 
 void *read_blob_data_from_index(const struct index_state *istate,
-				const char *path, unsigned long *size)
+				const char *path, size_t *size)
 {
 	int pos, len;
-	unsigned long sz;
+	size_t sz;
 	enum object_type type;
 	void *data;
 

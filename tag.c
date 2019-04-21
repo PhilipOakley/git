@@ -41,7 +41,7 @@ int gpg_verify_tag(const struct object_id *oid, const char *name_to_report,
 {
 	enum object_type type;
 	char *buf;
-	unsigned long size;
+	size_t size;
 	int ret;
 
 	type = oid_object_info(the_repository, oid, NULL);
@@ -131,7 +131,7 @@ void release_tag_memory(struct tag *t)
 	t->date = 0;
 }
 
-int parse_tag_buffer(struct repository *r, struct tag *item, const void *data, unsigned long size)
+int parse_tag_buffer(struct repository *r, struct tag *item, const void *data, size_t size)
 {
 	struct object_id oid;
 	char type[20];
@@ -194,7 +194,7 @@ int parse_tag(struct tag *item)
 {
 	enum object_type type;
 	void *data;
-	unsigned long size;
+	size_t size;
 	int ret;
 
 	if (item->object.parsed)

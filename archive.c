@@ -73,7 +73,7 @@ static void format_subst(const struct commit *commit,
 void *object_file_to_archive(const struct archiver_args *args,
 			     const char *path, const struct object_id *oid,
 			     unsigned int mode, enum object_type *type,
-			     unsigned long *sizep)
+			     size_t *sizep)
 {
 	void *buffer;
 	const struct commit *commit = args->convert ? args->commit : NULL;

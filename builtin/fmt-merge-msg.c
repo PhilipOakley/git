@@ -471,7 +471,7 @@ static void fmt_merge_msg_title(struct strbuf *out,
 static void fmt_tag_signature(struct strbuf *tagbuf,
 			      struct strbuf *sig,
 			      const char *buf,
-			      unsigned long len)
+			      size_t len)
 {
 	const char *tag_body = strstr(buf, "\n\n");
 	if (tag_body) {
@@ -493,7 +493,7 @@ static void fmt_merge_msg_sigs(struct strbuf *out)
 	for (i = 0; i < origins.nr; i++) {
 		struct object_id *oid = origins.items[i].util;
 		enum object_type type;
-		unsigned long size, len;
+		size_t size, len;
 		char *buf = read_object_file(oid, &type, &size);
 		struct strbuf sig = STRBUF_INIT;
 

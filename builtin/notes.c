@@ -122,7 +122,7 @@ static int list_each_note(const struct object_id *object_oid,
 
 static void copy_obj_to_fd(int fd, const struct object_id *oid)
 {
-	unsigned long size;
+	size_t size;
 	enum object_type type;
 	char *buf = read_object_file(oid, &type, &size);
 	if (buf) {
@@ -252,7 +252,7 @@ static int parse_reuse_arg(const struct option *opt, const char *arg, int unset)
 	char *buf;
 	struct object_id object;
 	enum object_type type;
-	unsigned long len;
+	size_t len;
 
 	BUG_ON_OPT_NEG(unset);
 
@@ -616,7 +616,7 @@ static int append_edit(int argc, const char **argv, const char *prefix)
 
 	if (note && !edit) {
 		/* Append buf to previous note contents */
-		unsigned long size;
+		size_t size;
 		enum object_type type;
 		char *prev_buf = read_object_file(note, &type, &size);
 
