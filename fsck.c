@@ -815,7 +815,7 @@ static int fsck_commit_buffer(struct commit *commit, const char *buffer,
 }
 
 static int fsck_commit(struct commit *commit, const char *data,
-	unsigned long size, struct fsck_options *options)
+	size_t size, struct fsck_options *options)
 {
 	const char *buffer = data ?  data : get_commit_buffer(commit, &size);
 	int ret = fsck_commit_buffer(commit, buffer, size, options);
@@ -825,7 +825,7 @@ static int fsck_commit(struct commit *commit, const char *data,
 }
 
 static int fsck_tag_buffer(struct tag *tag, const char *data,
-	unsigned long size, struct fsck_options *options)
+	size_t size, struct fsck_options *options)
 {
 	struct object_id oid;
 	int ret = 0;
@@ -920,7 +920,7 @@ done:
 }
 
 static int fsck_tag(struct tag *tag, const char *data,
-	unsigned long size, struct fsck_options *options)
+	size_t size, struct fsck_options *options)
 {
 	struct object *tagged = tag->tagged;
 
@@ -971,7 +971,7 @@ static int fsck_gitmodules_fn(const char *var, const char *value, void *vdata)
 }
 
 static int fsck_blob(struct blob *blob, const char *buf,
-		     unsigned long size, struct fsck_options *options)
+		     size_t size, struct fsck_options *options)
 {
 	struct fsck_gitmodules_data data;
 	struct config_options config_opts = { 0 };
@@ -1007,7 +1007,7 @@ static int fsck_blob(struct blob *blob, const char *buf,
 	return data.ret;
 }
 
-int fsck_object(struct object *obj, void *data, unsigned long size,
+int fsck_object(struct object *obj, void *data, size_t size,
 	struct fsck_options *options)
 {
 	if (!obj)
@@ -1049,7 +1049,7 @@ int fsck_finish(struct fsck_options *options)
 	while ((oid = oidset_iter_next(&iter))) {
 		struct blob *blob;
 		enum object_type type;
-		unsigned long size;
+		size_t size;
 		char *buf;
 
 		if (oidset_contains(&gitmodules_done, oid))

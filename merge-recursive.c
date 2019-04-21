@@ -919,7 +919,7 @@ static int update_file_flags(struct merge_options *opt,
 	if (update_wd) {
 		enum object_type type;
 		void *buf;
-		unsigned long size;
+		size_t size;
 
 		if (S_ISGITLINK(contents->mode)) {
 			/*
@@ -2923,7 +2923,7 @@ static int read_oid_strbuf(struct merge_options *opt,
 {
 	void *buf;
 	enum object_type type;
-	unsigned long size;
+	size_t size;
 	buf = read_object_file(oid, &type, &size);
 	if (!buf)
 		return err(opt, _("cannot read object %s"), oid_to_hex(oid));

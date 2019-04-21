@@ -8,7 +8,7 @@
 /* opaque */
 struct git_istream;
 
-struct git_istream *open_istream(const struct object_id *, enum object_type *, unsigned long *, struct stream_filter *);
+struct git_istream *open_istream(const struct object_id *, enum object_type *, size_t *, struct stream_filter *);
 int close_istream(struct git_istream *);
 ssize_t read_istream(struct git_istream *, void *, size_t);
 

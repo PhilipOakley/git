@@ -25,7 +25,7 @@ static int verify_object(const struct object_id *oid, const char *expected_type)
 {
 	int ret = -1;
 	enum object_type type;
-	unsigned long size;
+	size_t size;
 	void *buffer = read_object_file(oid, &type, &size);
 	const struct object_id *repl = lookup_replace_object(the_repository, oid);
 
@@ -37,7 +37,7 @@ static int verify_object(const struct object_id *oid, const char *expected_type)
 	return ret;
 }
 
-static int verify_tag(char *buffer, unsigned long size)
+static int verify_tag(char *buffer, size_t size)
 {
 	int typelen;
 	char type[20];

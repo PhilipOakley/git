@@ -116,7 +116,7 @@ struct blame_scoreboard {
 	 * indexed with scoreboard.lineno[blame_entry.lno].
 	 */
 	const char *final_buf;
-	unsigned long final_buf_size;
+	size_t final_buf_size;
 
 	/* linked list of blames */
 	struct blame_entry *ent;

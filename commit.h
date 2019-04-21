@@ -79,7 +79,7 @@ struct commit *lookup_commit_reference_by_name(const char *name);
  */
 struct commit *lookup_commit_or_die(const struct object_id *oid, const char *ref_name);
 
-int parse_commit_buffer(struct repository *r, struct commit *item, const void *buffer, unsigned long size, int check_graph);
+int parse_commit_buffer(struct repository *r, struct commit *item, const void *buffer, size_t size, int check_graph);
 int repo_parse_commit_internal(struct repository *r, struct commit *item,
 			       int quiet_on_missing, int use_commit_graph);
 int repo_parse_commit_gently(struct repository *r,
@@ -111,13 +111,13 @@ void free_commit_buffer_slab(struct buffer_slab *bs);
  * Associate an object buffer with the commit. The ownership of the
  * memory is handed over to the commit, and must be free()-able.
  */
-void set_commit_buffer(struct repository *r, struct commit *, void *buffer, unsigned long size);
+void set_commit_buffer(struct repository *r, struct commit *, void *buffer, size_t size);
 
 /*
  * Get any cached object buffer associated with the commit. Returns NULL
  * if none. The resulting memory should not be freed.
  */
-const void *get_cached_commit_buffer(struct repository *, const struct commit *, unsigned long *size);
+const void *get_cached_commit_buffer(struct repository *, const struct commit *, size_t *size);
 
 /*
  * Get the commit's object contents, either from cache or by reading the object
@@ -126,7 +126,7 @@ const void *get_cached_commit_buffer(struct repository *, const struct commit *,
  */
 const void *repo_get_commit_buffer(struct repository *r,
 				   const struct commit *,
-				   unsigned long *size);
+				   size_t *size);
 #ifndef NO_THE_REPOSITORY_COMPATIBILITY_MACROS
 #define get_commit_buffer(c, s) repo_get_commit_buffer(the_repository, c, s)
 #endif
@@ -163,7 +163,7 @@ void release_commit_memory(struct parsed_object_pool *pool, struct commit *c);
  * Disassociate any cached object buffer from the commit, but do not free it.
  * The buffer (or NULL, if none) is returned.
  */
-const void *detach_commit_buffer(struct commit *, unsigned long *sizep);
+const void *detach_commit_buffer(struct commit *, size_t *sizep);
 
 /* Find beginning and length of commit subject. */
 int find_commit_subject(const char *commit_buffer, const char **subject);

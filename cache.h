@@ -784,7 +784,7 @@ int chmod_index_entry(struct index_state *, struct cache_entry *ce, char flip);
 int ce_same_name(const struct cache_entry *a, const struct cache_entry *b);
 void set_object_name_for_intent_to_add_entry(struct cache_entry *ce);
 int index_name_is_other(const struct index_state *, const char *, int);
-void *read_blob_data_from_index(const struct index_state *, const char *, unsigned long *);
+void *read_blob_data_from_index(const struct index_state *, const char *, size_t *);
 
 /* do stat comparison even if CE_VALID is true */
 #define CE_MATCH_IGNORE_VALID		01
@@ -1299,10 +1299,11 @@ char *xdg_cache_home(const char *filename);
 
 int git_open_cloexec(const char *name, int flags);
 #define git_open(name) git_open_cloexec(name, O_RDONLY)
-int unpack_loose_header(git_zstream *stream, unsigned char *map, unsigned long mapsize, void *buffer, unsigned long bufsiz);
-int parse_loose_header(const char *hdr, unsigned long *sizep);
 
-int check_object_signature(const struct object_id *oid, void *buf, unsigned long size, const char *type);
+int unpack_loose_header(git_zstream *stream, unsigned char *map, size_t mapsize, void *buffer, size_t bufsiz);
+int parse_loose_header(const char *hdr, size_t *sizep);
+
+int check_object_signature(const struct object_id *oid, void *buf, size_t size, const char *type);
 
 int finalize_object_file(const char *tmpfile, const char *filename);
 
@@ -1498,9 +1499,9 @@ int name_compare(const char *name1, size_t len1, const char *name2, size_t len2)
 int cache_name_stage_compare(const char *name1, int len1, int stage1, const char *name2, int len2, int stage2);
 
 void *read_object_with_reference(const struct object_id *oid,
-				 const char *required_type,
-				 unsigned long *size,
-				 struct object_id *oid_ret);
+					const char *required_type,
+					size_t *size,
+					struct object_id *oid_ret);
 
 struct object *repo_peel_to_type(struct repository *r,
 				 const char *name, int namelen,

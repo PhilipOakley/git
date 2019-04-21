@@ -182,7 +182,7 @@ static size_t common_prefix_len(const struct pathspec *pathspec)
  */
 char *common_prefix(const struct pathspec *pathspec)
 {
-	unsigned long len = common_prefix_len(pathspec);
+	size_t len = common_prefix_len(pathspec);
 
 	return len ? xmemdupz(pathspec->items[0].match, len) : NULL;
 }
@@ -238,7 +238,7 @@ static int do_read_blob(const struct object_id *oid, struct oid_stat *oid_stat,
 			size_t *size_out, char **data_out)
 {
 	enum object_type type;
-	unsigned long sz;
+	size_t sz;
 	char *data;
 
 	*size_out = 0;
@@ -2869,7 +2869,7 @@ static void load_oid_stat(struct oid_stat *oid_stat, const unsigned char *data,
 	oid_stat->valid = 1;
 }
 
-struct untracked_cache *read_untracked_extension(const void *data, unsigned long sz)
+struct untracked_cache *read_untracked_extension(const void *data, size_t sz)
 {
 	struct untracked_cache *uc;
 	struct read_data rd;
