@@ -22,7 +22,8 @@ static void flush(struct hashfile *f, const void *buf, size_t count)
 		if (ret != count)
 			die("%s: sha1 file truncated", f->name);
 		if (memcmp(buf, check_buffer, count))
-			die("sha1 file '%s' validation error", f->name);
+			die("sha1 file '%s' validation error, Count %"PRIuMAX,
+			    f->name, (uintmax_t)count);
 	}
 
 	for (;;) {

@@ -47,7 +47,7 @@ int fsync_object_files;
 size_t packed_git_window_size = DEFAULT_PACKED_GIT_WINDOW_SIZE;
 size_t packed_git_limit = DEFAULT_PACKED_GIT_LIMIT;
 size_t delta_base_cache_limit = 96 * 1024 * 1024;
-unsigned long big_file_threshold = 512 * 1024 * 1024;
+size_t big_file_threshold = 512 * 1024 * 1024;
 int pager_use_color = 1;
 const char *editor_program;
 const char *askpass_program;
@@ -71,7 +71,7 @@ int grafts_replace_parents = 1;
 int core_apply_sparse_checkout;
 int merge_log_config = -1;
 int precomposed_unicode = -1; /* see probe_utf8_pathname_composition() */
-unsigned long pack_size_limit_cfg;
+size_t pack_size_limit_cfg;
 enum log_refs_config log_all_ref_updates = LOG_REFS_UNSET;
 
 #ifndef PROTECT_HFS_DEFAULT
