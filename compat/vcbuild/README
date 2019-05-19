@@ -18,6 +18,13 @@ The Steps to Build Git with VS2015 or VS2017 from the command line.
    Makefile:
       <repo_root>/compat/vcbuild/MSVC-DEFS-GEN
 
+   - If you update your Visual Studio version, then delete the MSVC-DEFS-GEN
+   file so that fresh environment variables can be discovered.
+
+   Or clean the "vcpkg" environment with:
+
+   $ make MSVC=1 clean
+
 2. OPTIONALLY copy the third-party *.dll and *.pdb files into the repo
    root to make it easier to run and debug git.exe without having to
    manipulate your PATH.  This is especially true for debug sessions in
