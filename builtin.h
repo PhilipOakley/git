@@ -207,6 +207,7 @@ int cmd_read_tree(int argc, const char **argv, const char *prefix);
 int cmd_rebase(int argc, const char **argv, const char *prefix);
 int cmd_rebase__interactive(int argc, const char **argv, const char *prefix);
 int cmd_receive_pack(int argc, const char **argv, const char *prefix);
+int cmd_redo(int argc, const char **argv, const char *prefix); /* rerere synonym */
 int cmd_reflog(int argc, const char **argv, const char *prefix);
 int cmd_remote(int argc, const char **argv, const char *prefix);
 int cmd_remote_ext(int argc, const char **argv, const char *prefix);

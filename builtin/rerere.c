@@ -11,6 +11,7 @@
 
 static const char * const rerere_usage[] = {
 	N_("git rerere [clear | forget <path>... | status | remaining | diff | gc]"),
+	N_("git redo, synonymous with git rerere"),
 	NULL,
 };
 
@@ -48,6 +49,11 @@ static int diff_two(const char *file1, const char *label1,
 	free(minus.ptr);
 	free(plus.ptr);
 	return ret;
+}
+
+int cmd_redo(int argc, const char **argv, const char *prefix)
+{
+	return cmd_rerere(argc, argv, prefix);
 }
 
 int cmd_rerere(int argc, const char **argv, const char *prefix)
