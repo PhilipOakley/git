@@ -264,4 +264,9 @@ test_expect_success '--color overrides auto-color' '
 	test_cmp expect.color actual
 '
 
+test_expect_success '-a & -r options do not take a branch name, without --list' '
+	test_must_fail git branch -a HEAD
+	test_must_fail git branch -r HEAD
+'
+
 test_done
