@@ -26,11 +26,11 @@ Git for Windows also releases versions that reflect the [upstream release candid
 
 ## Snapshot versions ('nightlies')
 
-Git for Windows also provides snapshots (these are not releases) of the progressing upstream development from the gitforwindows/master branch at the [Snapshots](https://wingit.blob.core.windows.net/files/index.html) page. Link also at the footer of the [Git for Windows](https://gitforwindows.org/) home page.
+Git for Windows also provides snapshots (these are not releases) of the progressing upstream development from the Git-for-Windows "master" branch at the [Snapshots](https://wingit.blob.core.windows.net/files/index.html) page. Link also at the footer of the [Git for Windows](https://gitforwindows.org/) home page.
 
 ## Following 'upstream' developments
 
-The [gitforwindows/git repository](https://github.com/git-for-windows/git) also provides the shears/* and vs/master branches. These branches folow the upstream development in addition to the Windows specific patches via automated continuous integration. The vs/master branch is compiled via the MSVC tool chain.
+The [gitforwindows/git repository](https://github.com/git-for-windows/git) also provides the shears/* and vs/master branches. The shears branches follow the upstream development with the addition of the Windows specific patches via automated continuous integration. The vs/master branch adds a commit on top of Git-for-Windows "master", providing the project files ready to build Git in Visual Studio using the MSVC tool chain.
 
 ## Reporting a Vulnerability
 
