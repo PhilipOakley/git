@@ -1637,6 +1637,13 @@ test_lazy_prereq SIZE_T_IS_64BIT '
 	test 8 -le "$(build_option sizeof-size_t)"
 '
 
+test_lazy_prereq ZLIB_IS_LLP64 '
+	: 
+	ZLIB_FLAGS=$(test-tool zlib-compile-flags)
+	test 36 -eq "$((ZLIB_FLAGS & 60))" # 0x24 = 36d, 0x3C = 60d
+	test 101 -eq "$(test-tool zlib-compile-flags)"
+'
+
 test_lazy_prereq TIME_IS_64BIT 'test-tool date is64bit'
 test_lazy_prereq TIME_T_IS_64BIT 'test-tool date time_t-is64bit'
 
