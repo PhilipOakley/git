@@ -492,6 +492,9 @@ This test harness library does the following things:
    the --root option documented above, and a '.stress-<N>' suffix
    appended by the --stress option.
 
+ - The --global and --system config files are ignored, and
+   a basic --local config is created in the tst repository.
+
  - Defines standard test helper functions for your scripts to
    use.  These functions are designed to make all scripts behave
    consistently when command line arguments --verbose (or -v),
