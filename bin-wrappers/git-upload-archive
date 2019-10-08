@@ -4,7 +4,7 @@
 # to run test suite against sandbox, but with only bindir-installed
 # executables in PATH.  The Makefile copies this into various
 # files in bin-wrappers, substituting
-# /d/a/1/s and git-upload-archive.exe.
+# /c/git-sdk-64/usr/src/VisualStudioGit and git-upload-archive.exe.
 
 test -n "${GIT_EXEC_PATH##*:*}" ||
 		GIT_EXEC_PATH="$(cygpath -u "$GIT_EXEC_PATH")"

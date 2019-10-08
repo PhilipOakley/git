@@ -69,7 +69,7 @@ use File::Path qw/rmtree/;
 use File::Basename;
 use Getopt::Long qw(:config require_order no_ignore_case);
 
-my $VERSION = '2.23.0.windows.1.17.gcd9994f969.dirty.MSVC';
+my $VERSION = '2.23.0.windows.1.33.g1541e3db21.dirty.MSVC';
 
 my $log = GITCVS::log->new();
 my $cfg;
