@@ -18,7 +18,7 @@ test_expect_success SIZE_T_IS_64BIT,ZLIB_IS_LLP64 'setup >4GiB file' '
 test_expect_success SIZE_T_IS_64BIT,ZLIB_IS_LLP64 '>4GiB loose object' '
 
 	: just check zlib deflation and not the large pack crc32
-	git add file &&
+	git -c pack.packsizelimit = 2g add file &&
 	git fsck --verbose --strict --full 
 '
 
@@ -30,7 +30,8 @@ test_expect_success SIZE_T_IS_64BIT,ZLIB_IS_LLP64 '>4GiB pack file with commit' 
 	git commit -m msg file &&
 	# test here make sure it is packed correctly
 	git verify-pack -s .git/objects/pack/*.pack &&
-	git fsck --verbose --strict --full
+	git fsck --verbose --strict --full &&
+	false
 '
 
 test_done
