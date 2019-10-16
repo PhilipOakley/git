@@ -485,6 +485,13 @@ This test harness library does the following things:
    the --root option documented above, and a '.stress-<N>' suffix
    appended by the --stress option.
 
+ - The test framework sets GIT_CONFIG_NOSYSTEM=1, thus ignoring any
+   --system config files. The --global config is redirected through
+   the environment variables. It unsets the $XDG_CONFIG_HOME variable
+   and sets HOME="$TRASH_DIRECTORY" for the tests.
+   A basic --local config is created in the test repository.
+   See linkgit:git-config[1].
+
  - Defines standard test helper functions for your scripts to
    use.  These functions are designed to make all scripts behave
    consistently when command line arguments --verbose (or -v),
