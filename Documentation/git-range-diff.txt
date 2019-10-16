@@ -162,7 +162,48 @@ changed.
 Algorithm
 ---------
 
-The general idea is this: we generate a cost matrix between the commits
+The general idea is this:
+
+When `range-diff` tries to determine matching pairs of patches, it
+builds an `(m+n)x(m+n)` cost matrix, where `m` is the number of patches
+in the first commit range and `n` is the number of patches in the second
+one.
+
+Why not `m x n`? Well, that's the obvious matrix, and that's what it
+starts with, essentially assigning the number of lines of the diff
+between the diffs as "cost".
+
+But then `git range-diff` extends the cost matrix to allow for _all_ of
+the `m` patches to be considered deleted, and _all_ of the `n` patches
+to be added. As cost, it cannot use a "diff of diffs" because there is
+no second diff. So it uses the number of lines of the one diff it has,
+multiplied by the creation factor interpreted as a percentage.
+
+The naive creation factor would be 100%, which is (almost) as if we
+assumed an empty diff for the missing diff. But that would make the
+range-diff too eager to dismiss rewrites, as experience obviously showed
+(not my experience, but Thomas Rast's, who came up with `tbdiff` after
+all): the diff of diffs includes a diff header, for example.
+
+The interpretation I offered (although I inverted what I wanted to say)
+is similar in spirit to that metric (which is not actually a metric, I
+believe, because I expect it to violate the triangle inequality) is
+obviously inaccurate: the number of lines of the diff of diffs does not
+say anything about the number of matching lines, quite to the contrary,
+it correlates somewhat to the number of non-matching lines.
+
+So a better interpretation would have been:
+
+	The default creation factor is 60 (roughly speaking, it wants at
+	most 60% of the diffs' lines to differ, otherwise it considers
+	them not to be a match.
+
+This is still inaccurate, but at least it gets the idea of the
+range-diff across.
+
+--
+
+we generate a cost matrix between the commits
 in both commit ranges, then solve the least-cost assignment.
 
 The cost matrix is populated thusly: for each pair of commits, both
