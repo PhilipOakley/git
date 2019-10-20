@@ -162,33 +162,44 @@ changed.
 Algorithm
 ---------
 
-The general idea is this:
+** Question: does the coded algorith do two steps mxn, then (m+n)x(m+n), or just one. when does it select. Is the descriphion metaphorical/psuedocode?
+Answer is starts with the nxm core **
+
+Overview:
+~~~~~~~~~
+
+The general idea is this: 
+
+We generate a cost matrix between the commits in both commit ranges,
+then solve the least-cost assignment.
+
+The initial comparison determines exactly matching pairs of patches.  
+The cost comparison is then expanded to include
+the potential for new and deleted patchesd
 
 When `range-diff` tries to determine matching pairs of patches, it
 builds an `(m+n)x(m+n)` cost matrix, where `m` is the number of patches
 in the first commit range and `n` is the number of patches in the second
 one.
 
-Why not `m x n`? Well, that's the obvious matrix, and that's what it
-starts with, essentially assigning the number of lines of the diff
+Why not just`m x n`? Well, that's the obvious matrix, and that's 
+what it starts with,   {is this true?}
+ essentially assigning the number of lines of the diff
 between the diffs as "cost".
 
 But then `git range-diff` extends the cost matrix to allow for _all_ of
 the `m` patches to be considered deleted, and _all_ of the `n` patches
 to be added. As cost, it cannot use a "diff of diffs" because there is
 no second diff. So it uses the number of lines of the one diff it has,
-multiplied by the creation factor interpreted as a percentage.
+multiplied by the creation/ deletion fudge factor interpreted as a percentage.
 
-The naive creation factor would be 100%, which is (almost) as if we
+The naive creation/deletion fudge factor would be 100%, which is (almost) as if we
 assumed an empty diff for the missing diff. But that would make the
-range-diff too eager to dismiss rewrites, as experience obviously showed
-(not my experience, but Thomas Rast's, who came up with `tbdiff` after
-all): the diff of diffs includes a diff header, for example.
+range-diff too eager to dismiss rewrites, as experience showed.
 
-The interpretation I offered (although I inverted what I wanted to say)
-is similar in spirit to that metric (which is not actually a metric, I
-believe, because I expect it to violate the triangle inequality) is
-obviously inaccurate: the number of lines of the diff of diffs does not
+For example the diff of diffs includes a diff header.
+
+the number of lines of the diff of diffs does not
 say anything about the number of matching lines, quite to the contrary,
 it correlates somewhat to the number of non-matching lines.
 
@@ -199,23 +210,23 @@ So a better interpretation would have been:
 	them not to be a match.
 
 This is still inaccurate, but at least it gets the idea of the
-range-diff across.
+range-diff
 
---
+The cost matrix is populated thusly: 
 
-we generate a cost matrix between the commits
-in both commit ranges, then solve the least-cost assignment.
-
-The cost matrix is populated thusly: for each pair of commits, both
+for each pair of commits, both
 diffs are generated and the "diff of diffs" is generated, with 3 context
-lines, then the number of lines in that diff is used as cost.
+lines, then the number of lines in that "diff of diffs" is used as cost.
 
 To avoid false positives (e.g. when a patch has been removed, and an
 unrelated patch has been added between two iterations of the same patch
 series), the cost matrix is extended to allow for that, by adding
 fixed-cost entries for wholesale deletes/adds.
 
-Example: Let commits `1--2` be the first iteration of a patch series and
+Example:
+~~~~~~~~
+
+Let commits `1--2` be the first iteration of a patch series and
 `A--C` the second iteration. Let's assume that `A` is a cherry-pick of
 `2,` and `C` is a cherry-pick of `1` but with a small modification (say,
 a fixed typo). Visualize the commits as a bipartite graph:
