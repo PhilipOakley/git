@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<config>
+    <source_groups>
+        <source_group_31473e73-bbc5-4202-ad82-165590191540>
+            <build_file_path>
+                <compilation_db_path>C:/git-sdk-64/usr/src/git/Sourcetrail/compile_commands.json</compilation_db_path>
+            </build_file_path>
+            <compiler_flags>
+                <compiler_flag>-D WIN32</compiler_flag>
+                <compiler_flag>-D NDEBUG</compiler_flag>
+                <compiler_flag>-D DEFAULT_GIT_TEMPLATE_DIR=&quot;share/git-core/templates&quot;</compiler_flag>
+                <compiler_flag>-D DEFAULT_HELP_FORMAT=&quot;html&quot;</compiler_flag>
+                <compiler_flag>-D DETECT_MSYS_TTY</compiler_flag>
+                <compiler_flag>-D GIT_HOST_CPU=&quot;x86_64&quot;</compiler_flag>
+                <compiler_flag>-D GIT_HTML_PATH=&quot;share/doc/git-doc&quot;</compiler_flag>
+                <compiler_flag>-D GIT_INFO_PATH=&quot;share/info&quot;</compiler_flag>
+                <compiler_flag>-D GIT_MAN_PATH=&quot;share/man&quot;</compiler_flag>
+                <compiler_flag>-D HAVE_ALLOCA_H</compiler_flag>
+                <compiler_flag>-D HAVE_STRING_H</compiler_flag>
+                <compiler_flag>-D HAVE_WPGMPTR</compiler_flag>
+                <compiler_flag>-D MMAP_PREVENTS_DELETE</compiler_flag>
+                <compiler_flag>-D NATIVE_CRLF</compiler_flag>
+                <compiler_flag>-D NDEBUG</compiler_flag>
+                <compiler_flag>-D NOGDI</compiler_flag>
+                <compiler_flag>-D NO_GETTEXT</compiler_flag>
+                <compiler_flag>-D NO_INTTYPES_H</compiler_flag>
+                <compiler_flag>-D NO_IPV6</compiler_flag>
+                <compiler_flag>-D NO_LIBGEN_H</compiler_flag>
+                <compiler_flag>-D NO_MEMMEM</compiler_flag>
+                <compiler_flag>-D NO_MKDTEMP</compiler_flag>
+                <compiler_flag>-D NO_POLL</compiler_flag>
+                <compiler_flag>-D NO_POLL_H</compiler_flag>
+                <compiler_flag>-D NO_POSIX_GOODIES</compiler_flag>
+                <compiler_flag>-D NO_PREAD</compiler_flag>
+                <compiler_flag>-D NO_SETENV</compiler_flag>
+                <compiler_flag>-D NO_STRCASESTR</compiler_flag>
+                <compiler_flag>-D NO_STRLCPY</compiler_flag>
+                <compiler_flag>-D NO_STRTOUMAX</compiler_flag>
+                <compiler_flag>-D NO_ST_BLOCKS_IN_STRUCT_STAT</compiler_flag>
+                <compiler_flag>-D NO_SYMLINK_HEAD</compiler_flag>
+                <compiler_flag>-D NO_SYS_POLL_H</compiler_flag>
+                <compiler_flag>-D NO_UNIX_SOCKETS</compiler_flag>
+                <compiler_flag>-D OBJECT_CREATION_MODE=1</compiler_flag>
+                <compiler_flag>-D PAGER_ENV=&quot;LESS=FRX LV=-c&quot;</compiler_flag>
+                <compiler_flag>-D PROTECT_NTFS_DEFAULT=1</compiler_flag>
+                <compiler_flag>-D RUNTIME_PREFIX</compiler_flag>
+                <compiler_flag>-D SHA1DC_CUSTOM_INCLUDE_SHA1_C=&quot;cache.h&quot;</compiler_flag>
+                <compiler_flag>-D SHA1DC_CUSTOM_INCLUDE_UBC_CHECK_C=&quot;git-compat-util.h&quot;</compiler_flag>
+                <compiler_flag>-D SHA1DC_INIT_SAFE_HASH_DEFAULT=0</compiler_flag>
+                <compiler_flag>-D SHA1DC_NO_STANDARD_INCLUDES</compiler_flag>
+                <compiler_flag>-D SHA1_DC</compiler_flag>
+                <compiler_flag>-D SHA256_BLK</compiler_flag>
+                <compiler_flag>-D SHELL_PATH=&quot;/bin/sh&quot;</compiler_flag>
+                <compiler_flag>-D STRIP_EXTENSION=&quot;.exe&quot;</compiler_flag>
+                <compiler_flag>-D UNRELIABLE_FSTAT</compiler_flag>
+                <compiler_flag>-D USE_CURL_FOR_IMAP_SEND</compiler_flag>
+                <compiler_flag>-D USE_WIN32_MMAP</compiler_flag>
+                <compiler_flag>-D WIN32</compiler_flag>
+                <compiler_flag>-D _CONSOLE</compiler_flag>
+                <compiler_flag>-D _CRT_NONSTDC_NO_DEPRECATE</compiler_flag>
+                <compiler_flag>-D _CRT_SECURE_NO_WARNINGS</compiler_flag>
+                <compiler_flag>-D __USE_MINGW_ACCESS</compiler_flag>
+                <compiler_flag>-D WIN32</compiler_flag>
+                <compiler_flag>-D NDEBUG</compiler_flag>
+                <compiler_flag>-D BINDIR=&quot;bin&quot;</compiler_flag>
+                <compiler_flag>-D DEFAULT_HELP_FORMAT=&quot;html&quot;</compiler_flag>
+                <compiler_flag>-D DETECT_MSYS_TTY</compiler_flag>
+                <compiler_flag>-D ETC_GITATTRIBUTES=&quot;../etc/gitattributes&quot;</compiler_flag>
+                <compiler_flag>-D ETC_GITCONFIG=&quot;../etc/gitconfig&quot;</compiler_flag>
+                <compiler_flag>-D FALLBACK_RUNTIME_PREFIX=&quot;/mingw64&quot;</compiler_flag>
+                <compiler_flag>-D GAWK</compiler_flag>
+                <compiler_flag>-D GIT_BUILT_FROM_COMMIT=&quot;8715ee2266484bcec24dc2ab0de68f13ab739856&quot;</compiler_flag>
+                <compiler_flag>-D GIT_EXEC_PATH=&quot;libexec/git-core&quot;</compiler_flag>
+                <compiler_flag>-D GIT_HOST_CPU=&quot;x86_64&quot;</compiler_flag>
+                <compiler_flag>-D GIT_LOCALE_PATH=&quot;share/locale&quot;</compiler_flag>
+                <compiler_flag>-D GIT_USER_AGENT=&quot;git/2.24.0.windows.2.14.g8715ee2266.MSVC&quot;</compiler_flag>
+                <compiler_flag>-D GIT_VERSION=&quot;2.24.0.windows.2.14.g8715ee2266.MSVC&quot;</compiler_flag>
+                <compiler_flag>-D HAVE_ALLOCA_H</compiler_flag>
+                <compiler_flag>-D HAVE_STRING_H</compiler_flag>
+                <compiler_flag>-D HAVE_WPGMPTR</compiler_flag>
+                <compiler_flag>-D MMAP_PREVENTS_DELETE</compiler_flag>
+                <compiler_flag>-D NATIVE_CRLF</compiler_flag>
+                <compiler_flag>-D NDEBUG</compiler_flag>
+                <compiler_flag>-D NOGDI</compiler_flag>
+                <compiler_flag>-D NO_GETTEXT</compiler_flag>
+                <compiler_flag>-D NO_INTTYPES_H</compiler_flag>
+                <compiler_flag>-D NO_IPV6</compiler_flag>
+                <compiler_flag>-D NO_LIBGEN_H</compiler_flag>
+                <compiler_flag>-D NO_MBSUPPORT</compiler_flag>
+                <compiler_flag>-D NO_MEMMEM</compiler_flag>
+                <compiler_flag>-D NO_MKDTEMP</compiler_flag>
+                <compiler_flag>-D NO_POLL</compiler_flag>
+                <compiler_flag>-D NO_POLL_H</compiler_flag>
+                <compiler_flag>-D NO_POSIX_GOODIES</compiler_flag>
+                <compiler_flag>-D NO_PREAD</compiler_flag>
+                <compiler_flag>-D NO_SETENV</compiler_flag>
+                <compiler_flag>-D NO_STRCASESTR</compiler_flag>
+                <compiler_flag>-D NO_STRLCPY</compiler_flag>
+                <compiler_flag>-D NO_STRTOUMAX</compiler_flag>
+                <compiler_flag>-D NO_ST_BLOCKS_IN_STRUCT_STAT</compiler_flag>
+                <compiler_flag>-D NO_SYMLINK_HEAD</compiler_flag>
+                <compiler_flag>-D NO_SYS_POLL_H</compiler_flag>
+                <compiler_flag>-D NO_UNIX_SOCKETS</compiler_flag>
+                <compiler_flag>-D OBJECT_CREATION_MODE=1</compiler_flag>
+                <compiler_flag>-D PAGER_ENV=&quot;LESS=FRX LV=-c&quot;</compiler_flag>
+                <compiler_flag>-D PROTECT_NTFS_DEFAULT=1</compiler_flag>
+                <compiler_flag>-D RUNTIME_PREFIX</compiler_flag>
+                <compiler_flag>-D SHA1DC_CUSTOM_INCLUDE_SHA1_C=&quot;cache.h&quot;</compiler_flag>
+                <compiler_flag>-D SHA1DC_CUSTOM_INCLUDE_UBC_CHECK_C=&quot;git-compat-util.h&quot;</compiler_flag>
+                <compiler_flag>-D SHA1DC_INIT_SAFE_HASH_DEFAULT=0</compiler_flag>
+                <compiler_flag>-D SHA1DC_NO_STANDARD_INCLUDES</compiler_flag>
+                <compiler_flag>-D SHA1_DC</compiler_flag>
+                <compiler_flag>-D SHA256_BLK</compiler_flag>
+                <compiler_flag>-D SHELL_PATH=&quot;/bin/sh&quot;</compiler_flag>
+                <compiler_flag>-D STRIP_EXTENSION=&quot;.exe&quot;</compiler_flag>
+                <compiler_flag>-D UNRELIABLE_FSTAT</compiler_flag>
+                <compiler_flag>-D USE_CURL_FOR_IMAP_SEND</compiler_flag>
+                <compiler_flag>-D USE_WIN32_MMAP</compiler_flag>
+                <compiler_flag>-D WIN32</compiler_flag>
+                <compiler_flag>-D _CONSOLE</compiler_flag>
+                <compiler_flag>-D _CRT_NONSTDC_NO_DEPRECATE</compiler_flag>
+                <compiler_flag>-D _CRT_SECURE_NO_WARNINGS</compiler_flag>
+                <compiler_flag>-D __USE_MINGW_ACCESS</compiler_flag>
+                <compiler_flag>-std=c99</compiler_flag>
+                <compiler_flag>-no-logo</compiler_flag>
+            </compiler_flags>
+            <indexed_header_paths>
+                <indexed_header_path>..</indexed_header_path>
+            </indexed_header_paths>
+            <name>C/C++ from Compilation Database</name>
+            <pch_flags>
+                <use_compiler_flags>1</use_compiler_flags>
+            </pch_flags>
+            <status>enabled</status>
+            <type>C/C++ from Compilation Database</type>
+        </source_group_31473e73-bbc5-4202-ad82-165590191540>
+    </source_groups>
+    <version>8</version>
+</config>
