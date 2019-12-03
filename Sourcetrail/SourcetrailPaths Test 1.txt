@@ -1,0 +1,40 @@
+This is test 1 of Sourcetrail path/directory methods for Git
+https://github.com/CoatiSoftware/Sourcetrail/issues/804
+
+Options appear to be:
+
+    1. All files (compile_commands.json, Git_ScrTrl.srctrlprj, Git_ScrTrl.srctrldb, Git_ScrTrl.srctrlbm) at top level (works)
+    2. .json at top level, other three srctrl* in sub dir. (appears to work)
+    3. All files in sub dir. (not working yet, relative [to what] path troubles)
+
+https://github.com/CoatiSoftware/Sourcetrail/issues/804?email_source=notifications&email_token=AAG7HJ2TMHAB5QUGPW3MTETQV3VXJA5CNFSM4JR7D6RKYY3PNVWWK3TUL52HS4DFVREXG43VMVBW63LNMVXHJKTDN5WW2ZLOORPWSZGOEFK32CI#issuecomment-559267081
+
+https://youtu.be/7fguPwKR_7Y
+
+1. Open git.sln (double click) starts VS 2017 community ed. (with srctrl extn)
+2. (without rebuild) Srctrl 'create database': Directory= C:\git-sdk-64\usr\src\git Cstandard= C99
+3a. Finish/Import (?) Attempt `Import` - nothing (scrtrl isn't running yet)
+3b. start scrtrl (splash screen + 'connected to vs'); VSscrtl extn dialog has gone; redo the extn/import; second Srctrl 'New Source Group' has opened.
+3b1 Headers&directories to index: clicked 'select from Comp db', then ticked './' only (left all the 'Windows Kits' unchecked). scroll down, exluded's left blank; Next
+3b2 (flicks back to the New Project dialog, but as it is still selecting the source groups (C/C++ from Comp Db) its looks unchanged), so select "General" in top left side, and update the project name to "Git_sourcetrail_opt1". location is "ok C:/git-sdk-64/usr/src/git".
+3b3 "Create" !
+3b4 switch back to the other Sourcetrail window (now active, with a fresh blue 'start Indexing' dialog). "All files" (dot in circle) should already be selected.
+3b5 Click 'Start', wait ~one minute (00:01:38).
+3b6 Oops 1352 erreors. What did I miss. It's that "Additional Include Paths", (below the excluded files and directories entry in the Source group scroll down!)
+3b7 Use the (+) icon to add a line for the Additional Include Paths and enter "./" (without quotes). Save. Re-index. Start.
+3b8 Still errors, so not that. Must have been the "Compiler options" (the "-D" or "/D")
+4.0 open the compile_commands.json in your favourite editor, from the "command": line select/copy all the "-D" options and the -std and -nologo options, paste to a new file,
+4.1  replace all the " -D" with "\n-D" (i.e. swap the space for newline - extended chars), and insert newlines for the last two options.
+4.2 Select all, copy, re-focus on the Sourcetrail Edit Project, and past into the additional compile flags (after selecting the scribble pen icon).
+4.3 Save, re-index, start
+still Oooffed.
+
+5.0 Back to remembering what I did the first time.
+
+5.1 browse the VS project properties. Find the C/C++ tab list, open find ' Preprocessor': See (top of list) "Preprocessor Definitions" wioth a long list of ";" separated values. Copy them.
+see 4.0-4.1 but change ";" to "-D " etc.
+needed to use both Git project and Libgit (slightly different set.) YES!
+
+ideally filter for unique. remember last setting wins if you have duplicate but non identical settings.
+
+
