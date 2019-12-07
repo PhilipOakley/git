@@ -34,7 +34,7 @@ REM ================================================================
 	@FOR /F "delims=" %%D IN ("%~dp0") DO @SET cwd=%%~fD
 	cd %cwd%
 
-	dir vcpkg\vcpkg.exe >nul 2>nul && GOTO :install_libraries
+	dir vcpkg\vcpkg.exe >nul 2>nul && GOTO :check_for_updates
 
 	git.exe version 2>nul
 	IF ERRORLEVEL 1 (
@@ -53,6 +53,16 @@ REM ================================================================
 	IF ERRORLEVEL 1 ( EXIT /B 1 )
 
 	echo Successfully installed %cwd%vcpkg\vcpkg.exe
+	GOTO :install_libraries
+
+:check_for_updates
+	echo Checking for vcpkg updates and upgrades to installed libraries
+	cd %cwd%vcpkg
+	git pull
+	vcpkg update
+	vcpkg upgrade --no-dry-run
+
+	EXIT /B 0
 
 :install_libraries
 	SET arch=x64-windows
