@@ -180,9 +180,8 @@ sub createProject {
 EOM
     if ($target eq 'libgit') {
         print F << "EOM";
-    <PreBuildEvent Condition="!Exists('$cdup\\compat\\vcbuild\\vcpkg\\installed\\\$(VCPKGArch)\\include\\openssl\\ssl.h')">
-      <Message>Initialize VCPKG</Message>
-      <Command>del "$cdup\\compat\\vcbuild\\vcpkg"</Command>
+    <PreBuildEvent>
+      <Message>Initialize or update VCPKG</Message>
       <Command>call "$cdup\\compat\\vcbuild\\vcpkg_install.bat"</Command>
     </PreBuildEvent>
 EOM

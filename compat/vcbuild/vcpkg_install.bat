@@ -34,6 +34,12 @@ REM ================================================================
 	@FOR /F "delims=" %%D IN ("%~dp0") DO @SET cwd=%%~fD
 	cd %cwd%
 
+	SET arch=x64-windows
+
+REM is vcpkg package installed and complied \\compat\\vcbuild\\vcpkg\\installed\\\$(VCPKGArch)\\include\\openssl\\ssl.h
+	dir vcpkg\installed\%arch%\include\openssl\ssl.h >nul 2>nul && GOTO :check_for_updates
+
+REM is vcpkg package manager already cloned
 	dir vcpkg\vcpkg.exe >nul 2>nul && GOTO :install_libraries
 
 	git.exe version 2>nul
@@ -53,9 +59,19 @@ REM ================================================================
 	IF ERRORLEVEL 1 ( EXIT /B 1 )
 
 	echo Successfully installed %cwd%vcpkg\vcpkg.exe
+	GOTO :install_libraries
+
+:check_for_updates
+	echo Checking for vcpkg updates and upgrades to installed libraries
+	cd %cwd%vcpkg
+	git pull
+	.\vcpkg.exe update
+	.\vcpkg.exe upgrade --no-dry-run
+
+	EXIT /B 0
 
 :install_libraries
-	SET arch=x64-windows
+REM	SET arch=x64-windows
 
 	echo Installing third-party libraries...
 	FOR %%i IN (zlib expat libiconv openssl libssh2 curl) DO (
