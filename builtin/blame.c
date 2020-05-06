@@ -475,6 +475,7 @@ static void emit_other(struct blame_scoreboard *sb, struct blame_entry *ent, int
 			fputs(color, stdout);
 
 		if (suspect->commit->object.flags & UNINTERESTING) {
+			if (!show_boundary) continue;
 			if (blank_boundary)
 				memset(hex, ' ', length);
 			else if (!(opt & OUTPUT_ANNOTATE_COMPAT)) {
