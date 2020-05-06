@@ -2,6 +2,10 @@
 	Show blank SHA-1 for boundary commits.  This can also
 	be controlled via the `blame.blankboundary` config option.
 
+--no-boundary::
+	Do not show any boundary commit lines created by revision range
+	specifiers. Only show blamed lines.
+
 --root::
 	Do not treat root commits as boundaries.  This can also be
 	controlled via the `blame.showRoot` config option.
