@@ -535,13 +535,17 @@ See also INCOMPATIBLE OPTIONS below.
 --autosquash::
 --no-autosquash::
 	When the commit log message begins with "squash! ..." (or
-	"fixup! ..."), and there is already a commit in the todo list that
-	matches the same `...`, automatically modify the todo list of rebase
+	"fixup! ..."), and there is already an abbreviated commit oid or 
+	subject line in the todo list that
+	matches the same `...` (see below), automatically modify the todo list of rebase
 	-i so that the commit marked for squashing comes right after the
 	commit to be modified, and change the action of the moved commit
-	from `pick` to `squash` (or `fixup`).  A commit matches the `...` if
+	from `pick` to `squash` (or `fixup`). 
++
+A commit matches the `...` if
 	the commit subject matches, or if the `...` refers to the commit's
-	hash. As a fall-back, partial matches of the commit subject work,
+	hash. As a fall-back, partial matches of the commit subject work
+	or abbreviated hash,
 	too.  The recommended way to create fixup/squash commits is by using
 	the `--fixup`/`--squash` options of linkgit:git-commit[1].
 +
