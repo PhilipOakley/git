@@ -539,11 +539,13 @@ See also INCOMPATIBLE OPTIONS below.
 	matches the same `...`, automatically modify the todo list of rebase
 	-i so that the commit marked for squashing comes right after the
 	commit to be modified, and change the action of the moved commit
-	from `pick` to `squash` (or `fixup`).  A commit matches the `...` if
-	the commit subject matches, or if the `...` refers to the commit's
-	hash. As a fall-back, partial matches of the commit subject work,
-	too.  The recommended way to create fixup/squash commits is by using
-	the `--fixup`/`--squash` options of linkgit:git-commit[1].
+	from `pick` to `squash` (or `fixup`).
++
+A commit matches the `...` if
+the commit subject matches, or if the `...` refers to the commit's
+hash. As a fall-back, partial matches of the commit subject work,
+too.  The recommended way to create fixup/squash commits is by using
+the `--fixup`/`--squash` options of linkgit:git-commit[1].
 +
 If the `--autosquash` option is enabled by default using the
 configuration variable `rebase.autoSquash`, this option can be
