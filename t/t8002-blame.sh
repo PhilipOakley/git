@@ -122,4 +122,11 @@ test_expect_success '--exclude-promisor-objects does not BUG-crash' '
 	test_must_fail git blame --exclude-promisor-objects one
 '
 
+test_expect_success 'test --blame-only, exclude boundary commits' '
+	git blame --blame-only branch1.. -- file >actual &&
+	git blame branch1.. -- file >full &&
+	sed -e "/^\^/d" full >expected &&
+	test_cmp expected actual
+'
+
 test_done

@@ -45,6 +45,7 @@ static int max_score_digits;
 static int show_root;
 static int reverse;
 static int blank_boundary;
+static int blame_only;
 static int incremental;
 static int xdl_opts;
 static int abbrev = -1;
@@ -474,6 +475,7 @@ static void emit_other(struct blame_scoreboard *sb, struct blame_entry *ent, int
 			fputs(color, stdout);
 
 		if (suspect->commit->object.flags & UNINTERESTING) {
+			if (blame_only) continue;
 			if (blank_boundary)
 				memset(hex, ' ', length);
 			else if (!(opt & OUTPUT_ANNOTATE_COMPAT)) {
@@ -843,6 +845,7 @@ int cmd_blame(int argc, const char **argv, const char *prefix)
 	const struct option options[] = {
 		OPT_BOOL(0, "incremental", &incremental, N_("Show blame entries as we find them, incrementally")),
 		OPT_BOOL('b', NULL, &blank_boundary, N_("Show blank SHA-1 for boundary commits (Default: off)")),
+		OPT_BOOL(0, "blame-only", &blame_only, N_("Only show blamed commits (Default: off)")),
 		OPT_BOOL(0, "root", &show_root, N_("Do not treat root commits as boundaries (Default: off)")),
 		OPT_BOOL(0, "show-stats", &show_stats, N_("Show work cost statistics")),
 		OPT_BOOL(0, "progress", &show_progress, N_("Force progress reporting")),
